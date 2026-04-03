@@ -6,3 +6,8 @@ obj/
 .idea/
 *.DotSettings.user
 artifacts/
+
+# Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/

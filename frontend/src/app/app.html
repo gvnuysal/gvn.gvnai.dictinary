@@ -1,0 +1,21 @@
+<nav class="navbar">
+  <div class="navbar-brand">
+    <a routerLink="/words" class="logo">GvnAI Dictionary</a>
+  </div>
+  <div class="navbar-menu">
+    <a routerLink="/words" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Kelimeler</a>
+    <a routerLink="/words/search" routerLinkActive="active">Arama</a>
+  </div>
+  <div class="navbar-end">
+    @if (isAuthenticated) {
+      <span class="user-info">{{ userEmail }}</span>
+      <button class="btn btn-outline" (click)="logout()">Çıkış</button>
+    } @else {
+      <a routerLink="/login" class="btn btn-primary">Giriş Yap</a>
+    }
+  </div>
+</nav>
+
+<main class="container">
+  <router-outlet />
+</main>

@@ -1,0 +1,62 @@
+<div class="register-container">
+  <div class="card">
+    <h2>Kayıt Ol</h2>
+
+    @if (errorMessage()) {
+      <div class="error-message">{{ errorMessage() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="fullName">Ad Soyad</label>
+        <input
+          id="fullName"
+          type="text"
+          formControlName="fullName"
+          placeholder="Adınız Soyadınız"
+        />
+        @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+          <span class="field-error">Ad soyad gereklidir.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-posta</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="ornek@email.com"
+        />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="field-error">Geçerli bir e-posta adresi girin.</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Şifre</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="En az 6 karakter"
+        />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <span class="field-error">Şifre en az 6 karakter olmalıdır.</span>
+        }
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="loading()">
+        @if (loading()) {
+          Kayıt yapılıyor...
+        } @else {
+          Kayıt Ol
+        }
+      </button>
+    </form>
+
+    <p class="link-text">
+      Zaten hesabınız var mı? <a routerLink="/login">Giriş yapın</a>
+    </p>
+  </div>
+</div>
