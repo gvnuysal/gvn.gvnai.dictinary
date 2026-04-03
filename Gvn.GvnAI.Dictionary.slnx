@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Gvn.GvnAI.Dictionary.API/Gvn.GvnAI.Dictionary.API.csproj" />
+    <Project Path="src/Gvn.GvnAI.Dictionary.Application/Gvn.GvnAI.Dictionary.Application.csproj" />
+    <Project Path="src/Gvn.GvnAI.Dictionary.Domain.Shared/Gvn.GvnAI.Dictionary.Domain.Shared.csproj" />
+    <Project Path="src/Gvn.GvnAI.Dictionary.Domain/Gvn.GvnAI.Dictionary.Domain.csproj" />
+    <Project Path="src/Gvn.GvnAI.Dictionary.Infrastructure/Gvn.GvnAI.Dictionary.Infrastructure.csproj" />
+  </Folder>
+</Solution>

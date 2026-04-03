@@ -1,0 +1,38 @@
+<div class="inline-form">
+  <h4>Yeni Örnek</h4>
+
+  @if (errorMessage()) {
+    <div class="error-message">{{ errorMessage() }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="sourceText">Kaynak Metin</label>
+      <textarea id="sourceText" formControlName="sourceText" rows="2" placeholder="Örnek cümle"></textarea>
+      @if (form.controls.sourceText.touched && form.controls.sourceText.invalid) {
+        <span class="field-error">Kaynak metin gereklidir.</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="targetText">Hedef Metin</label>
+      <textarea id="targetText" formControlName="targetText" rows="2" placeholder="Çeviri (opsiyonel)"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="source">Kaynak Türü</label>
+      <select id="source" formControlName="source">
+        @for (src of exampleSources; track src.value) {
+          <option [value]="src.value">{{ src.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" [disabled]="loading()">
+        @if (loading()) { Kaydediliyor... } @else { Kaydet }
+      </button>
+      <button type="button" class="btn-cancel" (click)="onCancel()">İptal</button>
+    </div>
+  </form>
+</div>

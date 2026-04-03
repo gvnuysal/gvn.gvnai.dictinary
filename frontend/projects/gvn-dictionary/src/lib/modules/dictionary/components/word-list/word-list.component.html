@@ -1,0 +1,68 @@
+<div class="word-list-container">
+  <div class="header">
+    <h2>Kelimeler</h2>
+    <div class="actions">
+      <select (change)="onLanguageChange($any($event.target).value)">
+        <option value="">Tüm Diller</option>
+        @for (lang of languages(); track lang.id) {
+          <option [value]="lang.id">{{ lang.name }}</option>
+        }
+      </select>
+
+      @if (isAuthenticated()) {
+        <button class="btn-primary" (click)="navigateToCreate()">Yeni Kelime Ekle</button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Yükleniyor...</div>
+  } @else {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Kelime</th>
+            <th>Dil</th>
+            <th>Tür</th>
+            <th>Durum</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (word of words(); track word.id) {
+            <tr (click)="navigateToDetail(word.id)" class="clickable">
+              <td class="lemma">{{ word.lemma }}</td>
+              <td>{{ word.language.code }}</td>
+              <td>{{ word.partOfSpeech.code }}</td>
+              <td>
+                <span class="badge" [class]="getStatusClass(word.status)">
+                  {{ getStatusLabel(word.status) }}
+                </span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="empty">Kelime bulunamadı.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button
+          [disabled]="!hasPreviousPage()"
+          (click)="goToPage(pageNumber() - 1)">
+          &laquo; Önceki
+        </button>
+        <span class="page-info">{{ pageNumber() }} / {{ totalPages() }} ({{ totalCount() }} kayıt)</span>
+        <button
+          [disabled]="!hasNextPage()"
+          (click)="goToPage(pageNumber() + 1)">
+          Sonraki &raquo;
+        </button>
+      </div>
+    }
+  }
+</div>
