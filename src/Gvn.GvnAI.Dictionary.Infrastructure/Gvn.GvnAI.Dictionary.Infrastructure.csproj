@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gvn.GvnAI.Dictionary.Domain.Shared\Gvn.GvnAI.Dictionary.Domain.Shared.csproj" />
+    <ProjectReference Include="..\Gvn.GvnAI.Dictionary.Domain\Gvn.GvnAI.Dictionary.Domain.csproj" />
+    <ProjectReference Include="..\Gvn.GvnAI.Dictionary.Application\Gvn.GvnAI.Dictionary.Application.csproj" />
+    <ProjectReference Include="..\..\..\Gvn.GvnFramework\framework\src\Gvn.GvnFramework.EntityFramewokCore\Gvn.GvnFramework.EntityFramewokCore.csproj" />
+    <ProjectReference Include="..\..\..\Gvn.GvnFramework\framework\src\Gvn.GvnFramework.BackgroundJobs\Gvn.GvnFramework.BackgroundJobs.csproj" />
+    <ProjectReference Include="..\..\..\Gvn.GvnFramework\framework\src\Gvn.GvnFramework.Caching\Gvn.GvnFramework.Caching.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0-*" />
+    <PackageReference Include="Anthropic.SDK" Version="3.3.0" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gvn.GvnAI.Dictionary.Domain.Shared\Gvn.GvnAI.Dictionary.Domain.Shared.csproj" />
+    <ProjectReference Include="..\Gvn.GvnAI.Dictionary.Domain\Gvn.GvnAI.Dictionary.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Gvn.GvnFramework\framework\src\Gvn.GvnFramework.Application\Gvn.GvnFramework.Application.csproj" />
+    <ProjectReference Include="..\..\..\Gvn.GvnFramework\framework\src\Gvn.GvnFramework.Security\Gvn.GvnFramework.Security.csproj" />
+  </ItemGroup>
+
+</Project>
