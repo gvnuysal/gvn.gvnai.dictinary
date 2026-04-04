@@ -1,56 +1,70 @@
 <div class="auth-page">
-  <div class="auth-bg">
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
-    <div class="bg-orb bg-orb-3"></div>
+  <!-- Left: Branding Panel -->
+  <div class="auth-branding">
+    <div class="branding-content">
+      <div class="branding-icon">&#9670;</div>
+      <h1>Gvn<span class="accent">AI</span></h1>
+      <h2>Dictionary</h2>
+      <p class="branding-desc">Yapay zeka destekli bilingual sozluk platformu. Kelimeleri ogrenin, oynayarak pratik yapin.</p>
+      <div class="branding-features">
+        <div class="feature"><span>&#10024;</span> AI ile kelime zenginlestirme</div>
+        <div class="feature"><span>&#127918;</span> Kelime oyunu ile pratik</div>
+        <div class="feature"><span>&#128218;</span> Profesyonel sozluk mimarisi</div>
+      </div>
+    </div>
+    <div class="branding-bg">
+      <div class="bg-circle c1"></div>
+      <div class="bg-circle c2"></div>
+    </div>
   </div>
 
-  <div class="auth-card animate-in">
-    <div class="auth-header">
-      <div class="auth-logo">&#9670;</div>
-      <h1>Gvn<span class="gradient-text">AI</span> Dictionary</h1>
-      <p>Hesabiniza giris yapin</p>
-    </div>
-
-    @if (errorMessage()) {
-      <div class="error-message">{{ errorMessage() }}</div>
-    }
-
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="email">E-posta</label>
-        <div class="input-wrapper">
-          <span class="input-icon">&#9993;</span>
-          <input id="email" type="email" formControlName="email" placeholder="ornek@email.com" />
-        </div>
-        @if (form.controls.email.touched && form.controls.email.invalid) {
-          <span class="field-error">Gecerli bir e-posta adresi girin.</span>
-        }
+  <!-- Right: Login Form -->
+  <div class="auth-form-panel">
+    <div class="auth-form-inner animate-in">
+      <div class="form-header">
+        <h3>Hos Geldiniz</h3>
+        <p>Hesabiniza giris yapin</p>
       </div>
 
-      <div class="form-group">
-        <label for="password">Sifre</label>
-        <div class="input-wrapper">
-          <span class="input-icon">&#128274;</span>
-          <input id="password" type="password" formControlName="password" placeholder="Sifrenizi girin" />
+      @if (errorMessage()) {
+        <div class="error-message">{{ errorMessage() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="field">
+          <label for="email">E-posta</label>
+          <div class="input-box">
+            <span class="icon">&#9993;</span>
+            <input id="email" type="email" formControlName="email" placeholder="ornek&#64;email.com" />
+          </div>
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <span class="field-error">Gecerli bir e-posta girin.</span>
+          }
         </div>
-        @if (form.controls.password.touched && form.controls.password.invalid) {
-          <span class="field-error">Sifre gereklidir.</span>
-        }
+
+        <div class="field">
+          <label for="password">Sifre</label>
+          <div class="input-box">
+            <span class="icon">&#128274;</span>
+            <input id="password" type="password" formControlName="password" placeholder="Sifrenizi girin" />
+          </div>
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <span class="field-error">Sifre gereklidir.</span>
+          }
+        </div>
+
+        <button type="submit" class="submit-btn" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span> Giris yapiliyor...
+          } @else {
+            Giris Yap &#8594;
+          }
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Hesabiniz yok mu? <a routerLink="/register">Kayit Olun</a>
       </div>
-
-      <button type="submit" class="btn btn-primary btn-lg btn-full" [disabled]="loading()">
-        @if (loading()) {
-          <span class="spinner"></span> Giris yapiliyor...
-        } @else {
-          Giris Yap
-        }
-      </button>
-    </form>
-
-    <div class="auth-footer">
-      <span>Hesabiniz yok mu?</span>
-      <a routerLink="/register">Kayit Olun</a>
     </div>
   </div>
 </div>
