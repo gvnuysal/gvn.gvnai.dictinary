@@ -13,6 +13,7 @@ public class WordConfiguration : IEntityTypeConfiguration<Word>
         builder.HasKey(w => w.Id);
 
         builder.Property(w => w.Lemma).IsRequired().HasMaxLength(DictionaryConstants.MaxLemmaLength);
+        builder.Property(w => w.UserId).IsRequired();
         builder.Property(w => w.LanguageId).IsRequired();
         builder.Property(w => w.PartOfSpeechId).IsRequired();
         builder.Property(w => w.FrequencyRank);
@@ -28,11 +29,12 @@ public class WordConfiguration : IEntityTypeConfiguration<Word>
         builder.Property(w => w.DeletedBy).HasMaxLength(200);
 
         // Indexes
-        builder.HasIndex(w => new { w.Lemma, w.LanguageId }).IsUnique().HasFilter("\"IsDeleted\" = false");
+        builder.HasIndex(w => new { w.Lemma, w.LanguageId, w.UserId }).IsUnique().HasFilter("\"IsDeleted\" = false");
         builder.HasIndex(w => w.Status);
         builder.HasIndex(w => w.LanguageId);
 
         // FK relationships
+        builder.HasOne<User>().WithMany().HasForeignKey(w => w.UserId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<Language>().WithMany().HasForeignKey(w => w.LanguageId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<PartOfSpeech>().WithMany().HasForeignKey(w => w.PartOfSpeechId).OnDelete(DeleteBehavior.Restrict);
 

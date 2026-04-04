@@ -3,96 +3,97 @@ using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
 using Gvn.GvnAI.Dictionary.Application.Abstractions;
 using Gvn.GvnAI.Dictionary.Application.DTOs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Gvn.GvnAI.Dictionary.Infrastructure.Services;
 
 public class ClaudeAiDictionaryService(
-    IConfiguration configuration,
     ILogger<ClaudeAiDictionaryService> logger) : IAiDictionaryService
 {
+    private const string DefaultModel = "claude-sonnet-4-20250514";
+
     public async Task<WordEnrichmentResult?> EnrichWordAsync(
-        string lemma, string languageCode, string targetLanguageCode,
+        string apiKey, string lemma, string languageCode, string targetLanguageCode,
         CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(apiKey)) { logger.LogWarning("Claude API key not provided"); return null; }
         try
         {
-            var apiKey = configuration["Claude:ApiKey"];
-            if (string.IsNullOrWhiteSpace(apiKey))
-            {
-                logger.LogWarning("Claude API key is not configured");
-                return null;
-            }
-
             var client = new AnthropicClient(apiKey);
-            var model = configuration["Claude:Model"] ?? "claude-sonnet-4-20250514";
-
             var prompt = $$"""
                 You are a bilingual dictionary expert. Analyze the word "{{lemma}}" in {{languageCode}}.
                 Translate meanings to {{targetLanguageCode}}.
-
                 Return ONLY valid JSON in this exact format (no markdown, no code blocks):
                 {
-                    "senses": [
-                        {
-                            "definition": "definition in source language",
-                            "definitionShort": "brief definition or null",
-                            "registerCode": "formal/informal/slang or null",
-                            "domainCode": "subject domain code or null",
-                            "translations": [
-                                {
-                                    "text": "translated word/phrase",
-                                    "targetLanguageCode": "{{targetLanguageCode}}",
-                                    "partOfSpeechCode": "NOUN/VERB/ADJ etc or null",
-                                    "equivalenceType": "Exact/Near/Loose/Gap",
-                                    "confidenceScore": 0.95
-                                }
-                            ],
-                            "examples": [
-                                {
-                                    "sourceText": "example in source language",
-                                    "targetText": "example translation or null"
-                                }
-                            ]
-                        }
-                    ],
-                    "pronunciations": [
-                        {
-                            "ipa": "/IPA transcription/",
-                            "variant": "variant name or null",
-                            "isStandard": true
-                        }
-                    ],
-                    "etymology": "etymology text or null"
+                    "senses": [{"definition":"...","definitionShort":"...","registerCode":null,"domainCode":null,
+                      "translations":[{"text":"...","targetLanguageCode":"{{targetLanguageCode}}","partOfSpeechCode":null,"equivalenceType":"Exact","confidenceScore":0.95}],
+                      "examples":[{"sourceText":"...","targetText":"..."}]}],
+                    "pronunciations": [{"ipa":"/.../ ","variant":null,"isStandard":true}],
+                    "etymology": "..."
                 }
-
-                Provide 1-5 senses with translations and examples.
-                ConfidenceScore must be between 0.0 and 1.0.
-                If some fields have no data, use empty arrays or null.
+                Provide 1-5 senses. ConfidenceScore 0.0-1.0. Empty arrays or null for missing data.
                 """;
 
             var response = await client.Messages.GetClaudeMessageAsync(new MessageParameters
             {
-                Model = model,
-                MaxTokens = 2048,
+                Model = DefaultModel, MaxTokens = 2048,
                 Messages = [new Message(RoleType.User, prompt)]
             }, ctx: cancellationToken);
 
-            var responseText = response.Content
-                .OfType<TextContent>()
-                .FirstOrDefault()?.Text;
+            var text = response.Content.OfType<TextContent>().FirstOrDefault()?.Text;
+            if (string.IsNullOrWhiteSpace(text)) return null;
 
-            if (string.IsNullOrWhiteSpace(responseText))
-                return null;
-
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            return JsonSerializer.Deserialize<WordEnrichmentResult>(responseText, options);
+            return JsonSerializer.Deserialize<WordEnrichmentResult>(text, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
-        catch (Exception ex)
+        catch (Exception ex) { logger.LogError(ex, "Enrich failed for '{Lemma}'", lemma); return null; }
+    }
+
+    public async Task<string?> GetDefinitionAsync(string apiKey, string word, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(apiKey)) return null;
+        try
         {
-            logger.LogError(ex, "Failed to enrich word '{Lemma}' via Claude AI", lemma);
-            return null;
+            var client = new AnthropicClient(apiKey);
+            var response = await client.Messages.GetClaudeMessageAsync(new MessageParameters
+            {
+                Model = DefaultModel, MaxTokens = 150,
+                Messages = [new Message(RoleType.User, $"Define the English word \"{word}\" in one clear, concise sentence. Return ONLY the definition text.")]
+            }, ctx: cancellationToken);
+            return response.Content.OfType<TextContent>().FirstOrDefault()?.Text?.Trim();
         }
+        catch (Exception ex) { logger.LogError(ex, "Definition failed for '{Word}'", word); return null; }
+    }
+
+    public async Task<string?> TranslateWordAsync(string apiKey, string word, string targetLang, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(apiKey)) return null;
+        try
+        {
+            var client = new AnthropicClient(apiKey);
+            var langName = targetLang == "tr" ? "Turkish" : targetLang;
+            var response = await client.Messages.GetClaudeMessageAsync(new MessageParameters
+            {
+                Model = DefaultModel, MaxTokens = 50,
+                Messages = [new Message(RoleType.User, $"Translate the English word \"{word}\" to {langName}. Return ONLY the translated word(s). Max 3, comma separated.")]
+            }, ctx: cancellationToken);
+            return response.Content.OfType<TextContent>().FirstOrDefault()?.Text?.Trim();
+        }
+        catch (Exception ex) { logger.LogError(ex, "Translate failed for '{Word}'", word); return null; }
+    }
+
+    public async Task<string?> DetectPartOfSpeechAsync(string apiKey, string word, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(apiKey)) return null;
+        try
+        {
+            var client = new AnthropicClient(apiKey);
+            var response = await client.Messages.GetClaudeMessageAsync(new MessageParameters
+            {
+                Model = DefaultModel, MaxTokens = 10,
+                Messages = [new Message(RoleType.User, $"What is the primary part of speech of \"{word}\"? Reply ONLY: NOUN, VERB, ADJ, ADV, PRON, PREP, CONJ, INTERJ")]
+            }, ctx: cancellationToken);
+            return response.Content.OfType<TextContent>().FirstOrDefault()?.Text?.Trim().ToUpperInvariant();
+        }
+        catch (Exception ex) { logger.LogError(ex, "POS detection failed for '{Word}'", word); return null; }
     }
 }

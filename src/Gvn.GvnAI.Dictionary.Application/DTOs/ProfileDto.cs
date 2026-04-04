@@ -6,7 +6,8 @@ public sealed record ProfileDto(
     string FullName,
     string Role,
     DateTime MemberSince,
-    ProfileStatsDto Stats);
+    ProfileStatsDto Stats,
+    ApiSettingsDto ApiSettings);
 
 public sealed record ProfileStatsDto(
     int TotalGamesPlayed,
@@ -17,3 +18,10 @@ public sealed record ProfileStatsDto(
     double AverageAccuracy,
     int FavoriteWordsCount,
     int BestGameScore);
+
+public sealed record ApiSettingsDto(
+    string TranslateProvider,
+    bool HasClaudeKey,
+    bool HasGoogleKey,
+    string? ClaudeApiKey,
+    string? GoogleTranslateApiKey);

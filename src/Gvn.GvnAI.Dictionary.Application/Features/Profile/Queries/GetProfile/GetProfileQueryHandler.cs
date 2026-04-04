@@ -18,8 +18,15 @@ public sealed class GetProfileQueryHandler(
 
         var stats = await profileQueryService.GetUserStatsAsync(request.UserId, cancellationToken);
 
+        var apiSettings = new ApiSettingsDto(
+            user.TranslateProvider,
+            !string.IsNullOrWhiteSpace(user.ClaudeApiKey),
+            !string.IsNullOrWhiteSpace(user.GoogleTranslateApiKey),
+            user.ClaudeApiKey,
+            user.GoogleTranslateApiKey);
+
         return Result<ProfileDto>.Ok(new ProfileDto(
             user.Id, user.Email, user.FullName, user.Role,
-            user.CreatedAt, stats));
+            user.CreatedAt, stats, apiSettings));
     }
 }

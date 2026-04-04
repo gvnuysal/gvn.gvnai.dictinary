@@ -5,6 +5,7 @@ namespace Gvn.GvnAI.Dictionary.Application.Features.Words.Commands.CreateWordWit
 public sealed record CreateWordWithTranslationCommand(
     string Lemma,
     Guid PartOfSpeechId,
+    Guid UserId,
     string Definition,
     string TranslationText,
     string? DefinitionShort = null,

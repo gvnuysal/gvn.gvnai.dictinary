@@ -40,6 +40,6 @@ export class App {
 
   logout(): void {
     this.authService.logout();
-    window.location.href = '/words';
+    window.location.href = '/';
   }
 }

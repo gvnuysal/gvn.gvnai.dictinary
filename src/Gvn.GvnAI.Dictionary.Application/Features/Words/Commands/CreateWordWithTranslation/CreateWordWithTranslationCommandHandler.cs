@@ -25,12 +25,12 @@ public sealed class CreateWordWithTranslationCommandHandler(
             return Result<Guid>.Fail(Error.Failure("LANG_NOT_FOUND", "English or Turkish language not found in database."));
 
         // Duplicate kontrolü
-        var existing = await wordRepository.GetByLemmaAsync(request.Lemma, enLang.Id, cancellationToken);
+        var existing = await wordRepository.GetByLemmaAsync(request.Lemma, enLang.Id, request.UserId, cancellationToken);
         if (existing is not null)
             return Result<Guid>.Fail(DomainErrors.Word.DuplicateLemma(request.Lemma));
 
         // 1. Word oluştur (İngilizce)
-        var word = Word.Create(request.Lemma, enLang.Id, request.PartOfSpeechId);
+        var word = Word.Create(request.Lemma, enLang.Id, request.PartOfSpeechId, request.UserId);
         await wordRepository.AddAsync(word, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

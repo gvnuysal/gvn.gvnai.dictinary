@@ -15,6 +15,7 @@ public class EnrichPendingWordsJob(
     IRegisterRepository registerRepository,
     ISubjectDomainRepository subjectDomainRepository,
     IAiDictionaryService aiService,
+    Persistence.DictionaryDbContext dbContext,
     IUnitOfWork unitOfWork,
     ILogger<EnrichPendingWordsJob> logger) : IRecurringJob
 {
@@ -47,8 +48,17 @@ public class EnrichPendingWordsJob(
 
                 var targetCode = language.Code == "tr" ? "en" : "tr";
 
+                // Kullanıcının Claude key'ini al
+                var user = await dbContext.Users.FindAsync([word.UserId], cancellationToken);
+                var claudeKey = user?.ClaudeApiKey;
+                if (string.IsNullOrWhiteSpace(claudeKey))
+                {
+                    logger.LogWarning("Claude API key not set for user of word '{Lemma}', skipping", word.Lemma);
+                    continue;
+                }
+
                 var enrichment = await aiService.EnrichWordAsync(
-                    word.Lemma, language.Code, targetCode, cancellationToken);
+                    claudeKey, word.Lemma, language.Code, targetCode, cancellationToken);
 
                 if (enrichment is null)
                 {

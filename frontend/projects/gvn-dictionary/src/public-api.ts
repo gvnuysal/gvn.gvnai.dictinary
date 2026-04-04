@@ -26,3 +26,4 @@ export * from './lib/modules/dictionary/components/translation-form/translation-
 export * from './lib/modules/dictionary/components/example-form/example-form.component';
 export * from './lib/modules/dictionary/components/quiz/quiz.component';
 export * from './lib/modules/dictionary/components/profile/profile.component';
+export * from './lib/modules/dictionary/components/home/home.component';

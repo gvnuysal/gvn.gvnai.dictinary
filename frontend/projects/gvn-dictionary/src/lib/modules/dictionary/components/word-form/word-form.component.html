@@ -59,7 +59,12 @@
         </div>
 
         <div class="form-group">
-          <label for="translationText">Turkce Karsiligi</label>
+          <label for="translationText">
+            Turkce Karsiligi
+            @if (translating()) {
+              <span class="auto-translate-badge"><span class="spinner-xs"></span> Cevriliyor...</span>
+            }
+          </label>
           <div class="input-with-mic">
             <input id="translationText" type="text" formControlName="translationText" placeholder="ask, sevgi..." />
             @if (speech.isSupported) {

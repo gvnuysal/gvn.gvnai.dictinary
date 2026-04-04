@@ -12,7 +12,10 @@
     <div class="word-hero glass-card-static">
       <div class="hero-top">
         <div class="hero-info">
-          <h1 class="gradient-text hero-lemma">{{ w.lemma }}</h1>
+          <div class="hero-lemma-row">
+            <h1 class="gradient-text hero-lemma">{{ w.lemma }}</h1>
+            <button class="speak-btn" [class.speaking]="tts.isSpeaking()" (click)="tts.speak(w.lemma, 'en-US')" title="Dinle">&#128264;</button>
+          </div>
           <div class="hero-badges">
             <span class="lang-badge">{{ w.language.name }} ({{ w.language.code }})</span>
             <span class="badge badge-accent">{{ w.partOfSpeech.name }}</span>
@@ -111,7 +114,7 @@
         </div>
       }
 
-      @for (sense of w.senses; track sense.id; let i = $index) {
+      @for (sense of sortedSenses(w.senses); track sense.id; let i = $index) {
         <div class="sense-card glass-card">
           <div class="sense-card-header">
             <span class="sense-number-badge">{{ sense.senseNumber }}</span>

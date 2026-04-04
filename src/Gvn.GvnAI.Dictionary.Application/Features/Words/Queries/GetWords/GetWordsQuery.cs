@@ -4,6 +4,7 @@ using Gvn.GvnFramework.Application.Abstractions;
 namespace Gvn.GvnAI.Dictionary.Application.Features.Words.Queries.GetWords;
 
 public sealed record GetWordsQuery(
+    Guid UserId,
     Guid? LanguageId,
     int PageNumber = 1,
     int PageSize = 10) : IQuery<PagedResult<WordSummaryDto>>;

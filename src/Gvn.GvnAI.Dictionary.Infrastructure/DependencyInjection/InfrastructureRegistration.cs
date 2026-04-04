@@ -46,6 +46,10 @@ public static class InfrastructureRegistration
         // AI Service
         services.AddScoped<IAiDictionaryService, ClaudeAiDictionaryService>();
 
+        // Google Translate
+        services.AddHttpClient();
+        services.AddScoped<ITranslateService, GoogleTranslateService>();
+
         // Favorites
         services.AddScoped<IFavoriteRepository, FavoriteRepository>();
         services.AddScoped<IFavoriteQueryService, FavoriteQueryService>();

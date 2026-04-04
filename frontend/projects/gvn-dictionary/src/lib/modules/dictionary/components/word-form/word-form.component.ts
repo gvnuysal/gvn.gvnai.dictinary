@@ -1,9 +1,11 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, debounceTime, distinctUntilChanged, filter, switchMap, takeUntil } from 'rxjs';
 import { WordService } from '../../../../services/word.service';
 import { LookupService } from '../../../../services/lookup.service';
 import { SpeechService } from '../../../../services/speech.service';
+import { TranslateService } from '../../../../services/translate.service';
 import { PartOfSpeechDto, RegisterDto, SubjectDomainDto } from '../../../../models/lookup.model';
 
 @Component({
@@ -14,10 +16,11 @@ import { PartOfSpeechDto, RegisterDto, SubjectDomainDto } from '../../../../mode
   styleUrl: './word-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WordFormComponent implements OnInit {
+export class WordFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly wordService = inject(WordService);
   private readonly lookupService = inject(LookupService);
+  private readonly translateService = inject(TranslateService);
   private readonly route = inject(ActivatedRoute);
   readonly router = inject(Router);
   readonly speech = inject(SpeechService);
@@ -29,9 +32,11 @@ export class WordFormComponent implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly isEditMode = signal(false);
   readonly listeningField = signal<string | null>(null);
+  readonly translating = signal(false);
 
   private wordId: string | null = null;
   private currentLanguageId = '';
+  private destroy$ = new Subject<void>();
 
   readonly form = this.fb.nonNullable.group({
     lemma: ['', [Validators.required, Validators.maxLength(200)]],
@@ -69,7 +74,73 @@ export class WordFormComponent implements OnInit {
           }
         },
       });
+    } else {
+      this.setupAutoTranslate();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private setupAutoTranslate(): void {
+    // [PASIF] Google Translate: Türkçe karşılık otomatik çevir
+    // Aktif etmek için yorum satırını kaldırın ve appsettings.json'da GoogleTranslate:ApiKey ayarlayın
+    // this.form.controls.lemma.valueChanges.pipe(...).subscribe(...)
+
+    // Lemma değişince → Claude AI ile Türkçe karşılık getir
+    this.form.controls.lemma.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      debounceTime(600),
+      distinctUntilChanged(),
+      filter(v => v.trim().length >= 2),
+      switchMap(text => {
+        this.translating.set(true);
+        return this.translateService.aiTranslate(text, 'tr');
+      })
+    ).subscribe({
+      next: (translated) => {
+        this.translating.set(false);
+        if (!this.form.controls.translationText.dirty || !this.form.controls.translationText.value) {
+          this.form.controls.translationText.setValue(translated);
+        }
+      },
+      error: () => this.translating.set(false),
+    });
+
+    // Lemma değişince → Claude AI ile İngilizce tanım getir
+    this.form.controls.lemma.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      debounceTime(800),
+      distinctUntilChanged(),
+      filter(v => v.trim().length >= 2),
+      switchMap(text => this.translateService.define(text))
+    ).subscribe({
+      next: (definition) => {
+        if (!this.form.controls.definition.dirty || !this.form.controls.definition.value) {
+          this.form.controls.definition.setValue(definition);
+        }
+      },
+    });
+
+    // Lemma değişince → Claude AI ile sözcük türü algıla
+    this.form.controls.lemma.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      debounceTime(700),
+      distinctUntilChanged(),
+      filter(v => v.trim().length >= 2),
+      switchMap(text => this.translateService.detectPos(text))
+    ).subscribe({
+      next: (posCode) => {
+        if (!this.form.controls.partOfSpeechId.dirty || !this.form.controls.partOfSpeechId.value) {
+          const match = this.partsOfSpeech().find(p => p.code === posCode);
+          if (match) {
+            this.form.controls.partOfSpeechId.setValue(match.id);
+          }
+        }
+      },
+    });
   }
 
   startListening(field: 'lemma' | 'definition' | 'translationText' | 'definitionShort'): void {
@@ -83,9 +154,7 @@ export class WordFormComponent implements OnInit {
     this.listeningField.set(field);
 
     this.speech.listen(lang).then(text => {
-      const current = this.form.get(field)?.value ?? '';
-      const newValue = current ? `${current} ${text}` : text;
-      this.form.get(field)?.setValue(newValue);
+      this.form.get(field)?.setValue(text);
       this.listeningField.set(null);
     }).catch(() => {
       this.listeningField.set(null);

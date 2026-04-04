@@ -1,19 +1,24 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject, OnDestroy } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, UpperCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { QuizService } from '../../../../services/quiz.service';
+import { WordService } from '../../../../services/word.service';
 import { QuizQuestionDto, QuizAnswerResultDto, QuizResultDto } from '../../../../models/quiz.model';
+import { WordDto, SenseDto } from '../../../../models/word.model';
+import { TtsService } from '../../../../services/tts.service';
 
 @Component({
   selector: 'dict-quiz',
   standalone: true,
-  imports: [DecimalPipe, RouterLink],
+  imports: [DecimalPipe, UpperCasePipe, RouterLink],
   templateUrl: './quiz.component.html',
   styleUrl: './quiz.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuizComponent implements OnDestroy {
   private readonly quizService = inject(QuizService);
+  private readonly wordService = inject(WordService);
+  readonly tts = inject(TtsService);
 
   readonly gameState = signal<'idle' | 'playing' | 'answered' | 'finished'>('idle');
   readonly sessionId = signal<string | null>(null);
@@ -28,11 +33,16 @@ export class QuizComponent implements OnDestroy {
   readonly selectedOptionId = signal<string | null>(null);
   readonly loading = signal(false);
 
+  // Word card modal
+  readonly showWordModal = signal(false);
+  readonly modalWord = signal<WordDto | null>(null);
+  readonly modalLoading = signal(false);
+
   private timerInterval: ReturnType<typeof setInterval> | null = null;
   private questionStartTime = 0;
 
   readonly timerOffset = computed(() => {
-    const circumference = 2 * Math.PI * 45; // ~283
+    const circumference = 2 * Math.PI * 45;
     const progress = this.countdown() / 10;
     return circumference * (1 - progress);
   });
@@ -54,9 +64,7 @@ export class QuizComponent implements OnDestroy {
         this.loading.set(false);
         this.loadNextQuestion();
       },
-      error: () => {
-        this.loading.set(false);
-      }
+      error: () => this.loading.set(false),
     });
   }
 
@@ -64,6 +72,8 @@ export class QuizComponent implements OnDestroy {
     const sid = this.sessionId();
     if (!sid) return;
 
+    this.showWordModal.set(false);
+    this.modalWord.set(null);
     this.loading.set(true);
     this.quizService.getNextQuestion(sid).subscribe({
       next: (q) => {
@@ -79,10 +89,9 @@ export class QuizComponent implements OnDestroy {
         this.startTimer();
       },
       error: () => {
-        // No more questions — finish the game
         this.loading.set(false);
         this.finishGame();
-      }
+      },
     });
   }
 
@@ -90,19 +99,29 @@ export class QuizComponent implements OnDestroy {
     if (this.gameState() !== 'playing') return;
     this.clearTimer();
     this.selectedOptionId.set(optionId);
-    const responseTimeMs = Date.now() - this.questionStartTime;
-    this.submitAnswer(optionId, responseTimeMs);
+    this.submitAnswer(optionId, Date.now() - this.questionStartTime);
   }
 
   onTimeout(): void {
     this.clearTimer();
-    const responseTimeMs = 10000;
     this.selectedOptionId.set(null);
-    this.submitAnswer(null, responseTimeMs);
+    this.submitAnswer(null, 10000);
+  }
+
+  sortedSenses(senses: SenseDto[]): SenseDto[] {
+    return [...senses].sort((a, b) => a.senseNumber - b.senseNumber);
+  }
+
+  // Doğru cevap modal'ından devam
+  continueFromModal(): void {
+    this.showWordModal.set(false);
+    this.modalWord.set(null);
+    this.loadNextQuestion();
   }
 
   finishGame(): void {
     this.clearTimer();
+    this.showWordModal.set(false);
     const sid = this.sessionId();
     if (!sid) return;
 
@@ -116,7 +135,7 @@ export class QuizComponent implements OnDestroy {
       error: () => {
         this.loading.set(false);
         this.gameState.set('idle');
-      }
+      },
     });
   }
 
@@ -130,7 +149,7 @@ export class QuizComponent implements OnDestroy {
       wordId: q.wordId,
       selectedOptionId: optionId,
       correctOptionId: q.correctOptionId,
-      responseTimeMs
+      responseTimeMs,
     }).subscribe({
       next: (result) => {
         this.answerResult.set(result);
@@ -143,14 +162,27 @@ export class QuizComponent implements OnDestroy {
         this.gameState.set('answered');
         this.loading.set(false);
 
-        // Auto-advance after 2 seconds
-        setTimeout(() => {
-          this.loadNextQuestion();
-        }, 2000);
+        if (result.isCorrect) {
+          // Doğru cevap → kelime kartını yükle ve modal göster
+          this.modalLoading.set(true);
+          this.wordService.getWordById(q.wordId).subscribe({
+            next: (word) => {
+              this.modalWord.set(word);
+              this.modalLoading.set(false);
+              this.showWordModal.set(true);
+            },
+            error: () => {
+              this.modalLoading.set(false);
+              // Yüklenemezse 2sn sonra devam et
+              setTimeout(() => this.loadNextQuestion(), 2000);
+            },
+          });
+        } else {
+          // Yanlış cevap → 2sn sonra otomatik devam
+          setTimeout(() => this.loadNextQuestion(), 2000);
+        }
       },
-      error: () => {
-        this.loading.set(false);
-      }
+      error: () => this.loading.set(false),
     });
   }
 
@@ -158,7 +190,6 @@ export class QuizComponent implements OnDestroy {
     this.clearTimer();
     this.countdown.set(10);
     this.questionStartTime = Date.now();
-
     this.timerInterval = setInterval(() => {
       const remaining = this.countdown() - 1;
       if (remaining <= 0) {

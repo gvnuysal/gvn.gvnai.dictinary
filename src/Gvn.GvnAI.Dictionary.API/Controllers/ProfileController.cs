@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Gvn.GvnAI.Dictionary.Application.Features.Profile.Commands.UpdateApiSettings;
 using Gvn.GvnAI.Dictionary.Application.Features.Profile.Commands.UpdateProfile;
 using Gvn.GvnAI.Dictionary.Application.Features.Profile.Queries.GetProfile;
 using Gvn.GvnFramework.AspNetCore.Controllers;
@@ -26,6 +27,14 @@ public class ProfileController(IMediator mediator) : ApiControllerBase
         return HandleResult(result);
     }
 
+    [HttpPut("api-settings")]
+    public async Task<IActionResult> UpdateApiSettings([FromBody] UpdateApiSettingsRequest request)
+    {
+        var result = await mediator.Send(new UpdateApiSettingsCommand(
+            GetUserId(), request.TranslateProvider, request.ClaudeApiKey, request.GoogleTranslateApiKey));
+        return HandleResult(result);
+    }
+
     private Guid GetUserId()
     {
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -34,3 +43,4 @@ public class ProfileController(IMediator mediator) : ApiControllerBase
 }
 
 public record UpdateProfileRequest(string FullName);
+public record UpdateApiSettingsRequest(string TranslateProvider, string? ClaudeApiKey, string? GoogleTranslateApiKey);

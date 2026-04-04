@@ -68,7 +68,10 @@
       <!-- Word Card -->
       <div class="word-question glass-card-static">
         <span class="badge badge-accent">EN</span>
-        <h2 class="question-word">{{ question()?.lemma }}</h2>
+        <div class="question-word-row">
+          <h2 class="question-word">{{ question()?.lemma }}</h2>
+          <button class="speak-btn speak-btn-sm" (click)="tts.speak(question()!.lemma, 'en-US')" [class.speaking]="tts.isSpeaking()" title="Dinle">&#128264;</button>
+        </div>
         <p class="question-definition">{{ question()?.definition }}</p>
       </div>
 
@@ -111,6 +114,73 @@
         <button class="btn btn-ghost btn-sm" (click)="finishGame()" [disabled]="loading()">Oyunu Bitir</button>
       </div>
     </div>
+
+    <!-- Word Card Modal (doğru cevaplarda) -->
+    @if (showWordModal()) {
+      <div class="modal-overlay" (click)="continueFromModal()">
+        <div class="modal-content animate-in" (click)="$event.stopPropagation()">
+          @if (modalLoading()) {
+            <div class="modal-loading"><span class="spinner"></span></div>
+          } @else if (modalWord(); as w) {
+            <div class="modal-header">
+              <span class="modal-badge">&#127881; Dogru Bildiniz!</span>
+              <div class="modal-word-row">
+                <h2 class="modal-word gradient-text">{{ w.lemma }}</h2>
+                <button class="speak-btn" [class.speaking]="tts.isSpeaking()" (click)="tts.speak(w.lemma, 'en-US')" title="Dinle">&#128264;</button>
+              </div>
+              <div class="modal-meta">
+                <span class="badge badge-accent">{{ w.language.code | uppercase }}</span>
+                <span class="badge badge-primary">{{ w.partOfSpeech.name }}</span>
+              </div>
+            </div>
+
+            @if (w.pronunciations.length > 0) {
+              <div class="modal-section">
+                <span class="modal-label">Telaffuz</span>
+                @for (p of w.pronunciations; track p.id) {
+                  <span class="modal-ipa">{{ p.ipaTranscription }}</span>
+                }
+              </div>
+            }
+
+            @for (sense of sortedSenses(w.senses); track sense.id) {
+              <div class="modal-sense">
+                <div class="modal-sense-header">
+                  <span class="sense-num">{{ sense.senseNumber }}</span>
+                  <span class="sense-def">{{ sense.definition }}</span>
+                </div>
+                @for (t of sense.translations; track t.id) {
+                  <div class="modal-translation">
+                    <span class="tr-flag">TR</span>
+                    <span class="tr-text">{{ t.translationText }}</span>
+                    <span class="tr-eq badge badge-neutral">{{ ['Exact','Near','Loose','Gap'][t.equivalenceType] }}</span>
+                  </div>
+                }
+                @for (e of sense.examples; track e.id) {
+                  <div class="modal-example">
+                    <div class="ex-source">&#8220;{{ e.sourceText }}&#8221;</div>
+                    @if (e.targetText) {
+                      <div class="ex-target">&#8594; {{ e.targetText }}</div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            @if (w.etymologies.length > 0) {
+              <div class="modal-section">
+                <span class="modal-label">Koken</span>
+                <span class="modal-etym">{{ w.etymologies[0].text }}</span>
+              </div>
+            }
+
+          }
+        </div>
+        <button class="btn btn-primary btn-lg modal-continue-fixed" (click)="continueFromModal()">
+          Devam Et &#8594;
+        </button>
+      </div>
+    }
   </div>
 }
 

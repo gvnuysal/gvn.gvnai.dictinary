@@ -9,6 +9,11 @@ public class User : AggregateRoot
     public string FullName { get; private set; } = null!;
     public string Role { get; private set; } = "User";
 
+    // AI/Translation ayarları (kullanıcı bazlı)
+    public string TranslateProvider { get; private set; } = "claude"; // "claude" veya "google"
+    public string? ClaudeApiKey { get; private set; }
+    public string? GoogleTranslateApiKey { get; private set; }
+
     private User() { }
 
     public static User Create(string email, string passwordHash, string fullName)
@@ -29,5 +34,12 @@ public class User : AggregateRoot
     public void UpdatePassword(string passwordHash)
     {
         PasswordHash = passwordHash;
+    }
+
+    public void UpdateApiSettings(string translateProvider, string? claudeApiKey, string? googleTranslateApiKey)
+    {
+        TranslateProvider = translateProvider;
+        ClaudeApiKey = claudeApiKey;
+        GoogleTranslateApiKey = googleTranslateApiKey;
     }
 }

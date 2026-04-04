@@ -10,3 +10,5 @@ export * from './favorite.service';
 export * from './profile.service';
 export * from './theme.service';
 export * from './speech.service';
+export * from './translate.service';
+export * from './tts.service';

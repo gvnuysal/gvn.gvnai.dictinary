@@ -21,6 +21,7 @@ public sealed class EnrichWordCommandHandler(
     IRepository<Pronunciation> pronunciationRepository,
     IRepository<Etymology> etymologyRepository,
     IAiDictionaryService aiService,
+    IUserRepository userRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<EnrichWordCommand>
 {
     public async Task<Result> Handle(EnrichWordCommand request, CancellationToken cancellationToken)
@@ -36,8 +37,14 @@ public sealed class EnrichWordCommandHandler(
         var targetCode = request.TargetLanguageCode
                          ?? (language.Code == "tr" ? "en" : "tr");
 
+        // Kullanıcının Claude API key'ini DB'den al
+        var user = await userRepository.GetByIdAsync(request.UserId, cancellationToken);
+        var claudeKey = user?.ClaudeApiKey;
+        if (string.IsNullOrWhiteSpace(claudeKey))
+            return Result.Fail(Error.Validation("API_KEY_MISSING", "Claude API key ayarlanmamis. Profil sayfasindan ekleyin."));
+
         var enrichment = await aiService.EnrichWordAsync(
-            word.Lemma, language.Code, targetCode, cancellationToken);
+            claudeKey, word.Lemma, language.Code, targetCode, cancellationToken);
 
         if (enrichment is null)
         {

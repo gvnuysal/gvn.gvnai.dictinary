@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ProfileDto, UpdateProfileRequest } from '../models/profile.model';
+import { ProfileDto, UpdateProfileRequest, UpdateApiSettingsRequest } from '../models/profile.model';
 import { DICTIONARY_API_CONFIG } from './api-config';
 
 @Injectable({ providedIn: 'root' })
@@ -19,5 +19,9 @@ export class ProfileService {
 
   updateProfile(request: UpdateProfileRequest): Observable<void> {
     return this.http.put<void>(this.baseUrl, request);
+  }
+
+  updateApiSettings(request: UpdateApiSettingsRequest): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/api-settings`, request);
   }
 }

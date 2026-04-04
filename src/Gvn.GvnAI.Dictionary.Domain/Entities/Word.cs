@@ -12,6 +12,7 @@ public class Word : AggregateRoot, ISoftDeletable
     private readonly List<Etymology> _etymologies = [];
 
     public string Lemma { get; private set; } = null!;
+    public Guid UserId { get; private set; }
     public Guid LanguageId { get; private set; }
     public Guid PartOfSpeechId { get; private set; }
     public int? FrequencyRank { get; private set; }
@@ -33,11 +34,12 @@ public class Word : AggregateRoot, ISoftDeletable
 
     private Word() { }
 
-    public static Word Create(string lemma, Guid languageId, Guid partOfSpeechId)
+    public static Word Create(string lemma, Guid languageId, Guid partOfSpeechId, Guid userId)
     {
         var word = new Word
         {
             Lemma = lemma.Trim(),
+            UserId = userId,
             LanguageId = languageId,
             PartOfSpeechId = partOfSpeechId,
             Status = WordStatus.Pending

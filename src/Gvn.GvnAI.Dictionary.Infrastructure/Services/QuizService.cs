@@ -10,16 +10,14 @@ namespace Gvn.GvnAI.Dictionary.Infrastructure.Services;
 public class QuizService(DictionaryDbContext dbContext) : IQuizService
 {
     public async Task<(Guid WordId, string Lemma, string Definition, Guid CorrectTranslationId, string CorrectTranslationText)?> GetRandomWordWithTranslationAsync(
-        IEnumerable<Guid> excludeWordIds, CancellationToken ct = default)
+        Guid userId, IEnumerable<Guid> excludeWordIds, CancellationToken ct = default)
     {
         var excludeList = excludeWordIds.ToList();
 
-        // Önce sorulmamış kelimelerden dene
-        var candidate = await GetRandomCandidateAsync(excludeList, ct);
+        var candidate = await GetRandomCandidateAsync(userId, excludeList, ct);
 
-        // Tüm kelimeler sorulmuşsa, exclude listesini sıfırlayıp tekrar başla
         if (candidate is null && excludeList.Count > 0)
-            candidate = await GetRandomCandidateAsync([], ct);
+            candidate = await GetRandomCandidateAsync(userId, [], ct);
 
         if (candidate is null)
             return null;
@@ -27,9 +25,10 @@ public class QuizService(DictionaryDbContext dbContext) : IQuizService
         return (candidate.Id, candidate.Lemma, candidate.Definition, candidate.Translation.Id, candidate.Translation.TranslationText);
     }
 
-    private async Task<CandidateWord?> GetRandomCandidateAsync(List<Guid> excludeList, CancellationToken ct)
+    private async Task<CandidateWord?> GetRandomCandidateAsync(Guid userId, List<Guid> excludeList, CancellationToken ct)
     {
         return await dbContext.Words
+            .Where(w => w.UserId == userId)
             .Where(w => w.Status != WordStatus.Pending && w.Status != WordStatus.Failed)
             .Where(w => !excludeList.Contains(w.Id))
             .Where(w => w.Senses.Any(s => s.Translations.Any()))
@@ -63,11 +62,12 @@ public class QuizService(DictionaryDbContext dbContext) : IQuizService
     }
 
     public async Task<List<(Guid TranslationId, string Text)>> GetRandomWrongOptionsAsync(
-        Guid excludeWordId, int count, CancellationToken ct = default)
+        Guid userId, Guid excludeWordId, int count, CancellationToken ct = default)
     {
         var wrongOptions = await dbContext.Translations
             .Where(t => dbContext.Senses
                 .Where(s => s.WordId != excludeWordId)
+                .Where(s => dbContext.Words.Where(w => w.UserId == userId).Select(w => w.Id).Contains(s.WordId))
                 .Select(s => s.Id)
                 .Contains(t.SenseId))
             .OrderBy(t => EF.Functions.Random())

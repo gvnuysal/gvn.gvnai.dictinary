@@ -23,11 +23,11 @@ public sealed class CreateWordCommandHandler(
         if (pos is null)
             return Result<Guid>.Fail(DomainErrors.PartOfSpeech.NotFound(request.PartOfSpeechId));
 
-        var existing = await wordRepository.GetByLemmaAsync(request.Lemma, request.LanguageId, cancellationToken);
+        var existing = await wordRepository.GetByLemmaAsync(request.Lemma, request.LanguageId, request.UserId, cancellationToken);
         if (existing is not null)
             return Result<Guid>.Fail(DomainErrors.Word.DuplicateLemma(request.Lemma));
 
-        var word = Word.Create(request.Lemma, request.LanguageId, request.PartOfSpeechId);
+        var word = Word.Create(request.Lemma, request.LanguageId, request.PartOfSpeechId, request.UserId);
 
         await wordRepository.AddAsync(word, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

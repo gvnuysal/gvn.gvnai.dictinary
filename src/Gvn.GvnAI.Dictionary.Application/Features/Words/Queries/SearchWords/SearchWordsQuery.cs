@@ -5,6 +5,7 @@ using Gvn.GvnFramework.Application.Abstractions;
 namespace Gvn.GvnAI.Dictionary.Application.Features.Words.Queries.SearchWords;
 
 public sealed record SearchWordsQuery(
+    Guid UserId,
     string? Query,
     Guid? LanguageId,
     Guid? PartOfSpeechId,

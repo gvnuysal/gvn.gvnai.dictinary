@@ -1,0 +1,99 @@
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Yapay Zeka Destekli</div>
+    <h1 class="hero-title">
+      <span class="brand-icon">&#9670;</span>
+      Gvn<span class="gradient-text">AI</span> Dictionary
+    </h1>
+    <p class="hero-tagline">Yapay zeka destekli bilingual sozluk platformu</p>
+
+    <div class="hero-actions">
+      @if (isAuthenticated) {
+        <button class="btn btn-primary btn-lg" (click)="goToWords()">
+          &#9733; Kelimelerime Git
+        </button>
+      } @else {
+        <a routerLink="/login" class="btn btn-primary btn-lg">Giris Yap</a>
+        <a routerLink="/register" class="btn btn-accent btn-lg">Kayit Ol</a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+  <div class="section-inner">
+    <h2 class="section-title">Ozellikler</h2>
+    <div class="features-grid">
+      <div class="feature-card glass-card">
+        <div class="feature-icon">&#10024;</div>
+        <h3>AI Zenginlestirme</h3>
+        <p>Claude AI ile otomatik anlam, ceviri ve ornek cumle uretimi</p>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="feature-icon">&#127918;</div>
+        <h3>Kelime Oyunu</h3>
+        <p>Ingilizce-Turkce pratik yapin, puan kazanin</p>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="feature-icon">&#9829;</div>
+        <h3>Favori Sistemi</h3>
+        <p>Onemli kelimeleri kaydedin, kolayca erisin</p>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="feature-icon">&#127769;</div>
+        <h3>Tema Secimi</h3>
+        <p>Koyu, acik veya otomatik tema secenekleri</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works">
+  <div class="section-inner">
+    <h2 class="section-title">Nasil Calisir?</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Kelime Ekle</h3>
+        <p>Ingilizce kelime ve Turkce karsiligini girin</p>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>AI Zenginlestir</h3>
+        <p>Anlam, ceviri ve ornek cumleler otomatik olusturulur</p>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Oyunla Pratik</h3>
+        <p>Quiz ile ogrenmenizi pekistirin</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats">
+  <div class="section-inner">
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-value">1000+</span>
+        <span class="stat-label">Kelime</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">50+</span>
+        <span class="stat-label">Kullanici</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">AI</span>
+        <span class="stat-label">Destekli</span>
+      </div>
+    </div>
+  </div>
+</section>

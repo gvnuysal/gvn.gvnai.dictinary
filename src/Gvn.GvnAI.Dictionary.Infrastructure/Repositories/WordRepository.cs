@@ -10,10 +10,14 @@ namespace Gvn.GvnAI.Dictionary.Infrastructure.Repositories;
 public class WordRepository(DictionaryDbContext context)
     : EfRepository<Word, DictionaryDbContext>(context), IWordRepository
 {
-    public async Task<Word?> GetByLemmaAsync(string lemma, Guid languageId, CancellationToken cancellationToken = default)
+    public async Task<Word?> GetByLemmaAsync(string lemma, Guid languageId, Guid? userId = null, CancellationToken cancellationToken = default)
     {
-        return await DbSet
-            .FirstOrDefaultAsync(w => w.Lemma == lemma && w.LanguageId == languageId, cancellationToken);
+        var queryable = DbSet.Where(w => w.Lemma == lemma && w.LanguageId == languageId);
+
+        if (userId.HasValue)
+            queryable = queryable.Where(w => w.UserId == userId.Value);
+
+        return await queryable.FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<Word?> GetByIdWithSensesAsync(Guid id, CancellationToken cancellationToken = default)
@@ -40,11 +44,14 @@ public class WordRepository(DictionaryDbContext context)
 
     public async Task<(IEnumerable<Word> Items, int TotalCount)> SearchAsync(
         string? query, Guid? languageId, Guid? partOfSpeechId, Guid? domainId, Guid? registerId,
-        int skip, int take, CancellationToken cancellationToken = default)
+        int skip, int take, Guid? userId = null, CancellationToken cancellationToken = default)
     {
         var queryable = DbSet
             .Include(w => w.Senses)
             .AsQueryable();
+
+        if (userId.HasValue)
+            queryable = queryable.Where(w => w.UserId == userId.Value);
 
         if (!string.IsNullOrWhiteSpace(query))
             queryable = queryable.Where(w => EF.Functions.ILike(w.Lemma, $"%{query}%"));

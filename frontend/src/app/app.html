@@ -1,21 +1,23 @@
 <nav class="navbar">
   <div class="navbar-inner">
-    <a routerLink="/words" class="navbar-brand">
+    <a routerLink="/" class="navbar-brand">
       <span class="brand-icon">&#9670;</span>
       <span class="brand-text">Gvn<span class="gradient-text">AI</span> Dictionary</span>
     </a>
 
-    <div class="navbar-links">
-      <a routerLink="/words" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        <span class="nav-icon">&#9733;</span> Kelimeler
-      </a>
-      <a routerLink="/words/search" routerLinkActive="active">
-        <span class="nav-icon">&#128269;</span> Arama
-      </a>
-      <a routerLink="/quiz" routerLinkActive="active">
-        <span class="nav-icon">&#127918;</span> Oyun
-      </a>
-    </div>
+    @if (isAuthenticated) {
+      <div class="navbar-links">
+        <a routerLink="/words" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <span class="nav-icon">&#9733;</span> Kelimeler
+        </a>
+        <a routerLink="/words/search" routerLinkActive="active">
+          <span class="nav-icon">&#128269;</span> Arama
+        </a>
+        <a routerLink="/quiz" routerLinkActive="active">
+          <span class="nav-icon">&#127918;</span> Oyun
+        </a>
+      </div>
+    }
 
     <div class="navbar-end">
       <button class="theme-toggle" (click)="toggleTheme()" [title]="themeTooltip">

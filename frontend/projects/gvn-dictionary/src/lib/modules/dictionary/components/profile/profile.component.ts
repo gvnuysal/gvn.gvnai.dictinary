@@ -31,6 +31,15 @@ export class ProfileComponent implements OnInit {
     fullName: ['', [Validators.required, Validators.maxLength(200)]],
   });
 
+  // API Settings form
+  readonly editingApi = signal(false);
+  readonly savingApi = signal(false);
+  readonly apiForm = this.fb.nonNullable.group({
+    translateProvider: ['claude'],
+    claudeApiKey: [''],
+    googleTranslateApiKey: [''],
+  });
+
   ngOnInit(): void {
     this.loadProfile();
     this.loadFavorites();
@@ -41,6 +50,7 @@ export class ProfileComponent implements OnInit {
       next: (p) => {
         this.profile.set(p);
         this.form.patchValue({ fullName: p.fullName });
+        this.apiForm.patchValue({ translateProvider: p.apiSettings.translateProvider });
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -75,6 +85,36 @@ export class ProfileComponent implements OnInit {
         this.loadProfile();
       },
       error: () => this.saving.set(false),
+    });
+  }
+
+  startEditApi(): void {
+    this.editingApi.set(true);
+    this.successMessage.set(null);
+  }
+
+  cancelEditApi(): void {
+    const p = this.profile();
+    if (p) this.apiForm.patchValue({ translateProvider: p.apiSettings.translateProvider });
+    this.apiForm.patchValue({ claudeApiKey: '', googleTranslateApiKey: '' });
+    this.editingApi.set(false);
+  }
+
+  saveApiSettings(): void {
+    this.savingApi.set(true);
+    const v = this.apiForm.getRawValue();
+    this.profileService.updateApiSettings({
+      translateProvider: v.translateProvider,
+      claudeApiKey: v.claudeApiKey || null,
+      googleTranslateApiKey: v.googleTranslateApiKey || null,
+    }).subscribe({
+      next: () => {
+        this.savingApi.set(false);
+        this.editingApi.set(false);
+        this.successMessage.set('API ayarlari guncellendi.');
+        this.loadProfile();
+      },
+      error: () => this.savingApi.set(false),
     });
   }
 

@@ -2,7 +2,10 @@ import { Routes } from '@angular/router';
 import { authGuard } from 'gvn-dictionary';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'words', pathMatch: 'full' },
+  {
+    path: '',
+    loadComponent: () => import('gvn-dictionary').then(m => m.HomeComponent)
+  },
   {
     path: 'login',
     loadComponent: () => import('gvn-dictionary').then(m => m.LoginComponent)
@@ -13,7 +16,8 @@ export const routes: Routes = [
   },
   {
     path: 'words',
-    loadComponent: () => import('gvn-dictionary').then(m => m.WordListComponent)
+    loadComponent: () => import('gvn-dictionary').then(m => m.WordListComponent),
+    canActivate: [authGuard]
   },
   {
     path: 'words/new',
@@ -22,11 +26,13 @@ export const routes: Routes = [
   },
   {
     path: 'words/search',
-    loadComponent: () => import('gvn-dictionary').then(m => m.WordSearchComponent)
+    loadComponent: () => import('gvn-dictionary').then(m => m.WordSearchComponent),
+    canActivate: [authGuard]
   },
   {
     path: 'words/:id',
-    loadComponent: () => import('gvn-dictionary').then(m => m.WordDetailComponent)
+    loadComponent: () => import('gvn-dictionary').then(m => m.WordDetailComponent),
+    canActivate: [authGuard]
   },
   {
     path: 'words/:id/edit',

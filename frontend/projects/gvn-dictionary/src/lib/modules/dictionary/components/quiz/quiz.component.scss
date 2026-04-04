@@ -512,3 +512,243 @@
     font-size: 2.2rem;
   }
 }
+
+// =============================================
+// Speak Button (TTS)
+// =============================================
+
+.speak-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background: rgba(0, 206, 201, 0.1);
+  }
+
+  &.speaking {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    animation: pulse-speak 1s ease-in-out infinite;
+  }
+
+  &.speak-btn-sm {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+}
+
+.question-word-row, .modal-word-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+@keyframes pulse-speak {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 206, 201, 0); }
+  50% { box-shadow: 0 0 12px 4px rgba(0, 206, 201, 0.25); }
+}
+
+// =============================================
+// Word Card Modal (doğru cevap)
+// =============================================
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(80vh - 70px);
+  overflow-y: auto;
+  background: var(--bg-card);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.modal-loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+
+  .modal-badge {
+    display: inline-block;
+    background: rgba(0, 184, 148, 0.15);
+    color: var(--color-success);
+    padding: 0.3rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+  }
+
+  .modal-word {
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin-bottom: 0.5rem;
+  }
+
+  .modal-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+
+.modal-section {
+  margin-bottom: 1rem;
+  padding: 0.8rem;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+
+  .modal-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .modal-ipa {
+    color: var(--color-accent);
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .modal-etym {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+}
+
+.modal-sense {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-primary);
+
+  .modal-sense-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .sense-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .sense-def {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+.modal-translation {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  margin-left: 2rem;
+
+  .tr-flag {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--color-accent);
+    background: rgba(0, 206, 201, 0.1);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .tr-text {
+    color: var(--text-heading);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .tr-eq {
+    font-size: 0.6rem;
+    margin-left: auto;
+  }
+}
+
+.modal-example {
+  margin: 0.5rem 0 0.5rem 2rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: rgba(108, 92, 231, 0.05);
+
+  .ex-source {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  .ex-target {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+  }
+}
+
+.modal-continue-fixed {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 520px;
+  margin-top: 1rem;
+  font-size: 1.05rem;
+  padding: 0.9rem;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}

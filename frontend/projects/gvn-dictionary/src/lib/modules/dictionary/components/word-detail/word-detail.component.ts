@@ -4,7 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { WordService } from '../../../../services/word.service';
 import { AuthService } from '../../../../services/auth.service';
 import { FavoriteService } from '../../../../services/favorite.service';
-import { WordDto, WordStatus, EquivalenceType, ExampleSource, DifficultyLevel } from '../../../../models/word.model';
+import { TtsService } from '../../../../services/tts.service';
+import { WordDto, SenseDto, WordStatus, EquivalenceType, ExampleSource, DifficultyLevel } from '../../../../models/word.model';
 import { SenseFormComponent } from '../sense-form/sense-form.component';
 import { TranslationFormComponent } from '../translation-form/translation-form.component';
 import { ExampleFormComponent } from '../example-form/example-form.component';
@@ -23,6 +24,7 @@ export class WordDetailComponent implements OnInit {
   private readonly wordService = inject(WordService);
   private readonly authService = inject(AuthService);
   private readonly favoriteService = inject(FavoriteService);
+  readonly tts = inject(TtsService);
 
   readonly word = signal<WordDto | null>(null);
   readonly isFavorite = signal(false);
@@ -80,6 +82,10 @@ export class WordDetailComponent implements OnInit {
         this.errorMessage.set(msg);
       },
     });
+  }
+
+  sortedSenses(senses: SenseDto[]): SenseDto[] {
+    return [...senses].sort((a, b) => a.senseNumber - b.senseNumber);
   }
 
   toggleFavorite(): void {

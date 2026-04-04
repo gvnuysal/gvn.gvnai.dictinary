@@ -17,7 +17,7 @@ public sealed class GetWordsQueryHandler(
         var skip = (request.PageNumber - 1) * request.PageSize;
         var (items, totalCount) = await wordRepository.SearchAsync(
             null, request.LanguageId, null, null, null,
-            skip, request.PageSize, cancellationToken);
+            skip, request.PageSize, request.UserId, cancellationToken);
 
         var allLanguages = await languageRepository.GetAllAsync(cancellationToken);
         var allPos = await partOfSpeechRepository.GetAllAsync(cancellationToken);

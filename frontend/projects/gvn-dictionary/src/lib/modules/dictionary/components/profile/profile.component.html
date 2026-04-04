@@ -77,6 +77,78 @@
     </div>
 
     <!-- Favorites -->
+    <!-- API Settings -->
+    <h2 class="section-title">API Ayarlari</h2>
+    <div class="api-settings glass-card-static">
+      @if (editingApi()) {
+        <form [formGroup]="apiForm" (ngSubmit)="saveApiSettings()">
+          <div class="form-group">
+            <label>Ceviri Saglayicisi</label>
+            <div class="provider-options">
+              <label class="radio-card" [class.selected]="apiForm.controls.translateProvider.value === 'claude'">
+                <input type="radio" formControlName="translateProvider" value="claude" />
+                <span class="radio-icon">&#10024;</span>
+                <span class="radio-label">Claude AI</span>
+                <span class="radio-desc">Yapay zeka ile ceviri, tanim, soz turu</span>
+              </label>
+              <label class="radio-card" [class.selected]="apiForm.controls.translateProvider.value === 'google'">
+                <input type="radio" formControlName="translateProvider" value="google" />
+                <span class="radio-icon">&#127760;</span>
+                <span class="radio-label">Google Translate</span>
+                <span class="radio-desc">Hizli ve dogrudan ceviri</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="claudeKey">Claude API Key</label>
+            <input id="claudeKey" type="password" formControlName="claudeApiKey"
+                   placeholder="{{ p.apiSettings.hasClaudeKey ? '••••••••  (mevcut, degistirmek icin yeni girin)' : 'sk-ant-...' }}" />
+          </div>
+
+          <div class="form-group">
+            <label for="googleKey">Google Translate API Key</label>
+            <input id="googleKey" type="password" formControlName="googleTranslateApiKey"
+                   placeholder="{{ p.apiSettings.hasGoogleKey ? '••••••••  (mevcut, degistirmek icin yeni girin)' : 'AIza...' }}" />
+          </div>
+
+          <div class="api-actions">
+            <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEditApi()">Iptal</button>
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="savingApi()">
+              @if (savingApi()) { <span class="spinner-xs"></span> } Kaydet
+            </button>
+          </div>
+        </form>
+      } @else {
+        <div class="api-display">
+          <div class="api-row">
+            <span class="api-label">Ceviri Saglayicisi</span>
+            <span class="badge" [class.badge-primary]="p.apiSettings.translateProvider === 'claude'" [class.badge-accent]="p.apiSettings.translateProvider === 'google'">
+              {{ p.apiSettings.translateProvider === 'claude' ? '&#10024; Claude AI' : '&#127760; Google Translate' }}
+            </span>
+          </div>
+          <div class="api-row">
+            <span class="api-label">Claude API Key</span>
+            @if (p.apiSettings.claudeApiKey) {
+              <code class="api-key">{{ p.apiSettings.claudeApiKey }}</code>
+            } @else {
+              <span class="api-status">&#10060; Ayarlanmamis</span>
+            }
+          </div>
+          <div class="api-row">
+            <span class="api-label">Google Translate Key</span>
+            @if (p.apiSettings.googleTranslateApiKey) {
+              <code class="api-key">{{ p.apiSettings.googleTranslateApiKey }}</code>
+            } @else {
+              <span class="api-status">&#10060; Ayarlanmamis</span>
+            }
+          </div>
+          <button class="btn btn-ghost btn-sm" (click)="startEditApi()">&#9881; Duzenle</button>
+        </div>
+      }
+    </div>
+
+    <!-- Favorites -->
     <h2 class="section-title">Favori Kelimeler</h2>
     @if (favorites().length === 0) {
       <div class="empty-state glass-card-static">

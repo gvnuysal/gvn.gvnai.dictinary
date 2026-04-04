@@ -5,6 +5,7 @@ export interface ProfileDto {
   role: string;
   memberSince: string;
   stats: ProfileStatsDto;
+  apiSettings: ApiSettingsDto;
 }
 
 export interface ProfileStatsDto {
@@ -18,6 +19,20 @@ export interface ProfileStatsDto {
   bestGameScore: number;
 }
 
+export interface ApiSettingsDto {
+  translateProvider: string;
+  hasClaudeKey: boolean;
+  hasGoogleKey: boolean;
+  claudeApiKey: string | null;
+  googleTranslateApiKey: string | null;
+}
+
 export interface UpdateProfileRequest {
   fullName: string;
+}
+
+export interface UpdateApiSettingsRequest {
+  translateProvider: string;
+  claudeApiKey: string | null;
+  googleTranslateApiKey: string | null;
 }

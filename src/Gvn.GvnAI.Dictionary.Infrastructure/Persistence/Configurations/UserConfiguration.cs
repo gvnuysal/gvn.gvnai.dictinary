@@ -28,6 +28,17 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(50);
 
+        builder.Property(u => u.TranslateProvider)
+            .IsRequired()
+            .HasMaxLength(20)
+            .HasDefaultValue("claude");
+
+        builder.Property(u => u.ClaudeApiKey)
+            .HasMaxLength(500);
+
+        builder.Property(u => u.GoogleTranslateApiKey)
+            .HasMaxLength(500);
+
         builder.HasIndex(u => u.Email).IsUnique();
     }
 }

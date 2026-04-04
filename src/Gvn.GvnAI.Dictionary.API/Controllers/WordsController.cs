@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Gvn.GvnAI.Dictionary.Application.Features.Words.Commands.CreateWord;
 using Gvn.GvnAI.Dictionary.Application.Features.Words.Commands.CreateWordWithTranslation;
 using Gvn.GvnAI.Dictionary.Application.Features.Words.Commands.DeleteWord;
@@ -17,13 +18,15 @@ namespace Gvn.GvnAI.Dictionary.API.Controllers;
 [Route("api/[controller]")]
 public class WordsController(IMediator mediator) : ApiControllerBase
 {
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll(
         [FromQuery] Guid? languageId,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10)
     {
-        var result = await mediator.Send(new GetWordsQuery(languageId, pageNumber, pageSize));
+        var userId = GetUserId();
+        var result = await mediator.Send(new GetWordsQuery(userId, languageId, pageNumber, pageSize));
         return HandleResult(result);
     }
 
@@ -34,6 +37,7 @@ public class WordsController(IMediator mediator) : ApiControllerBase
         return HandleResult(result);
     }
 
+    [Authorize]
     [HttpGet("search")]
     public async Task<IActionResult> Search(
         [FromQuery] string? q,
@@ -44,8 +48,9 @@ public class WordsController(IMediator mediator) : ApiControllerBase
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10)
     {
+        var userId = GetUserId();
         var result = await mediator.Send(new SearchWordsQuery(
-            q, languageId, partOfSpeechId, domainId, registerId, pageNumber, pageSize));
+            userId, q, languageId, partOfSpeechId, domainId, registerId, pageNumber, pageSize));
         return HandleResult(result);
     }
 
@@ -53,7 +58,7 @@ public class WordsController(IMediator mediator) : ApiControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateWordCommand command)
     {
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(command with { UserId = GetUserId() });
         return HandleResult(result);
     }
 
@@ -61,7 +66,7 @@ public class WordsController(IMediator mediator) : ApiControllerBase
     [HttpPost("with-translation")]
     public async Task<IActionResult> CreateWithTranslation([FromBody] CreateWordWithTranslationCommand command)
     {
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(command with { UserId = GetUserId() });
         return HandleResult(result);
     }
 
@@ -88,7 +93,13 @@ public class WordsController(IMediator mediator) : ApiControllerBase
     [HttpPost("{id:guid}/enrich")]
     public async Task<IActionResult> Enrich(Guid id, [FromQuery] string? targetLanguageCode)
     {
-        var result = await mediator.Send(new EnrichWordCommand(id, targetLanguageCode));
+        var result = await mediator.Send(new EnrichWordCommand(GetUserId(), id, targetLanguageCode));
         return HandleResult(result);
+    }
+
+    private Guid GetUserId()
+    {
+        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+        return Guid.Parse(claim!.Value);
     }
 }
