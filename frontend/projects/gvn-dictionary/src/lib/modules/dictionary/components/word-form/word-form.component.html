@@ -14,7 +14,15 @@
         <div class="form-row">
           <div class="form-group flex-2">
             <label for="lemma">Ingilizce Kelime</label>
-            <input id="lemma" type="text" formControlName="lemma" placeholder="love, book, run..." autofocus />
+            <div class="input-with-mic">
+              <input id="lemma" type="text" formControlName="lemma" placeholder="love, book, run..." autofocus />
+              @if (speech.isSupported) {
+                <button type="button" class="mic-btn" [class.listening]="listeningField() === 'lemma'" (click)="startListening('lemma')" title="Mikrofon ile soyle (EN)">
+                  @if (listeningField() === 'lemma') { <span class="mic-pulse"></span> }
+                  &#127908;
+                </button>
+              }
+            </div>
             @if (form.controls.lemma.touched && form.controls.lemma.invalid) {
               <span class="field-error">Kelime gereklidir.</span>
             }
@@ -36,8 +44,15 @@
 
         <div class="form-group">
           <label for="definition">Ingilizce Tanim</label>
-          <textarea id="definition" formControlName="definition" rows="2"
-                    placeholder="A deep feeling of affection..."></textarea>
+          <div class="input-with-mic">
+            <textarea id="definition" formControlName="definition" rows="2" placeholder="A deep feeling of affection..."></textarea>
+            @if (speech.isSupported) {
+              <button type="button" class="mic-btn textarea-mic" [class.listening]="listeningField() === 'definition'" (click)="startListening('definition')" title="Mikrofon ile soyle (EN)">
+                @if (listeningField() === 'definition') { <span class="mic-pulse"></span> }
+                &#127908;
+              </button>
+            }
+          </div>
           @if (form.controls.definition.touched && form.controls.definition.invalid) {
             <span class="field-error">Tanim gereklidir.</span>
           }
@@ -45,8 +60,15 @@
 
         <div class="form-group">
           <label for="translationText">Turkce Karsiligi</label>
-          <input id="translationText" type="text" formControlName="translationText"
-                 placeholder="ask, sevgi..." />
+          <div class="input-with-mic">
+            <input id="translationText" type="text" formControlName="translationText" placeholder="ask, sevgi..." />
+            @if (speech.isSupported) {
+              <button type="button" class="mic-btn" [class.listening]="listeningField() === 'translationText'" (click)="startListening('translationText')" title="Mikrofon ile soyle (TR)">
+                @if (listeningField() === 'translationText') { <span class="mic-pulse"></span> }
+                &#127908;
+              </button>
+            }
+          </div>
           @if (form.controls.translationText.touched && form.controls.translationText.invalid) {
             <span class="field-error">Turkce karsilik gereklidir.</span>
           }
@@ -54,8 +76,15 @@
 
         <div class="form-group">
           <label for="definitionShort">Kisa Tanim (opsiyonel)</label>
-          <input id="definitionShort" type="text" formControlName="definitionShort"
-                 placeholder="Deep affection" />
+          <div class="input-with-mic">
+            <input id="definitionShort" type="text" formControlName="definitionShort" placeholder="Deep affection" />
+            @if (speech.isSupported) {
+              <button type="button" class="mic-btn" [class.listening]="listeningField() === 'definitionShort'" (click)="startListening('definitionShort')" title="Mikrofon ile soyle (EN)">
+                @if (listeningField() === 'definitionShort') { <span class="mic-pulse"></span> }
+                &#127908;
+              </button>
+            }
+          </div>
         </div>
 
         <div class="form-row">
@@ -68,7 +97,6 @@
               }
             </select>
           </div>
-
           <div class="form-group flex-1">
             <label for="domainId">Alan (opsiyonel)</label>
             <select id="domainId" formControlName="domainId">

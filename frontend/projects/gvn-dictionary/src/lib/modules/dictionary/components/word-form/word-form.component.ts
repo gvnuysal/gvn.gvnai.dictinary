@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WordService } from '../../../../services/word.service';
 import { LookupService } from '../../../../services/lookup.service';
+import { SpeechService } from '../../../../services/speech.service';
 import { PartOfSpeechDto, RegisterDto, SubjectDomainDto } from '../../../../models/lookup.model';
 
 @Component({
@@ -19,6 +20,7 @@ export class WordFormComponent implements OnInit {
   private readonly lookupService = inject(LookupService);
   private readonly route = inject(ActivatedRoute);
   readonly router = inject(Router);
+  readonly speech = inject(SpeechService);
 
   readonly partsOfSpeech = signal<PartOfSpeechDto[]>([]);
   readonly registers = signal<RegisterDto[]>([]);
@@ -26,6 +28,7 @@ export class WordFormComponent implements OnInit {
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly isEditMode = signal(false);
+  readonly listeningField = signal<string | null>(null);
 
   private wordId: string | null = null;
   private currentLanguageId = '';
@@ -56,25 +59,37 @@ export class WordFormComponent implements OnInit {
       this.wordService.getWordById(this.wordId).subscribe({
         next: (word) => {
           this.currentLanguageId = word.language.id;
-          this.form.patchValue({
-            lemma: word.lemma,
-            partOfSpeechId: word.partOfSpeech.id,
-          });
+          this.form.patchValue({ lemma: word.lemma, partOfSpeechId: word.partOfSpeech.id });
           if (word.senses.length > 0) {
             const sense = word.senses[0];
-            this.form.patchValue({
-              definition: sense.definition,
-              definitionShort: sense.definitionShort ?? '',
-            });
+            this.form.patchValue({ definition: sense.definition, definitionShort: sense.definitionShort ?? '' });
             if (sense.translations.length > 0) {
-              this.form.patchValue({
-                translationText: sense.translations[0].translationText,
-              });
+              this.form.patchValue({ translationText: sense.translations[0].translationText });
             }
           }
         },
       });
     }
+  }
+
+  startListening(field: 'lemma' | 'definition' | 'translationText' | 'definitionShort'): void {
+    if (this.speech.isListening()) {
+      this.speech.stop();
+      this.listeningField.set(null);
+      return;
+    }
+
+    const lang = (field === 'translationText') ? 'tr-TR' : 'en-US';
+    this.listeningField.set(field);
+
+    this.speech.listen(lang).then(text => {
+      const current = this.form.get(field)?.value ?? '';
+      const newValue = current ? `${current} ${text}` : text;
+      this.form.get(field)?.setValue(newValue);
+      this.listeningField.set(null);
+    }).catch(() => {
+      this.listeningField.set(null);
+    });
   }
 
   onSubmit(): void {
@@ -89,43 +104,21 @@ export class WordFormComponent implements OnInit {
 
     if (this.isEditMode() && this.wordId) {
       this.wordService.updateWord(this.wordId, {
-        id: this.wordId,
-        lemma: v.lemma,
-        languageId: this.currentLanguageId,
-        partOfSpeechId: v.partOfSpeechId,
-        frequencyRank: null,
-        difficultyLevel: null,
-        isCompound: false,
-        isIdiom: false,
-        isProperNoun: false,
+        id: this.wordId, lemma: v.lemma, languageId: this.currentLanguageId,
+        partOfSpeechId: v.partOfSpeechId, frequencyRank: null, difficultyLevel: null,
+        isCompound: false, isIdiom: false, isProperNoun: false,
       }).subscribe({
-        next: () => {
-          this.loading.set(false);
-          this.router.navigate(['/words', this.wordId]);
-        },
-        error: (err) => {
-          this.loading.set(false);
-          this.errorMessage.set(this.extractError(err));
-        },
+        next: () => { this.loading.set(false); this.router.navigate(['/words', this.wordId]); },
+        error: (err) => { this.loading.set(false); this.errorMessage.set(this.extractError(err)); },
       });
     } else {
       this.wordService.createWordWithTranslation({
-        lemma: v.lemma,
-        partOfSpeechId: v.partOfSpeechId,
-        definition: v.definition,
-        translationText: v.translationText,
-        definitionShort: v.definitionShort || null,
-        registerId: v.registerId || null,
-        domainId: v.domainId || null,
+        lemma: v.lemma, partOfSpeechId: v.partOfSpeechId, definition: v.definition,
+        translationText: v.translationText, definitionShort: v.definitionShort || null,
+        registerId: v.registerId || null, domainId: v.domainId || null,
       }).subscribe({
-        next: (id) => {
-          this.loading.set(false);
-          this.router.navigate(['/words', id]);
-        },
-        error: (err) => {
-          this.loading.set(false);
-          this.errorMessage.set(this.extractError(err));
-        },
+        next: (id) => { this.loading.set(false); this.router.navigate(['/words', id]); },
+        error: (err) => { this.loading.set(false); this.errorMessage.set(this.extractError(err)); },
       });
     }
   }
