@@ -18,6 +18,9 @@
     </div>
 
     <div class="navbar-end">
+      <button class="theme-toggle" (click)="toggleTheme()" [title]="themeTooltip">
+        {{ themeIcon }}
+      </button>
       @if (isAuthenticated) {
         <a routerLink="/profile" class="user-badge" routerLinkActive="active-profile">{{ userEmail }}</a>
         <button class="btn btn-ghost btn-sm" (click)="logout()">Cikis</button>

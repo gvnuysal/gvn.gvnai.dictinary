@@ -8,3 +8,4 @@ export * from './example.service';
 export * from './quiz.service';
 export * from './favorite.service';
 export * from './profile.service';
+export * from './theme.service';
