@@ -23,6 +23,9 @@ public class DictionaryDbContext(
     public DbSet<Register> Registers => Set<Register>();
     public DbSet<SubjectDomain> SubjectDomains => Set<SubjectDomain>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<QuizSession> QuizSessions => Set<QuizSession>();
+    public DbSet<QuizAnswer> QuizAnswers => Set<QuizAnswer>();
+    public DbSet<Favorite> Favorites => Set<Favorite>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

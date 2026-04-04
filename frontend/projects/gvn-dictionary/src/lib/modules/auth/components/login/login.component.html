@@ -1,6 +1,16 @@
-<div class="login-container">
-  <div class="card">
-    <h2>Giriş Yap</h2>
+<div class="auth-page">
+  <div class="auth-bg">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+  </div>
+
+  <div class="auth-card animate-in">
+    <div class="auth-header">
+      <div class="auth-logo">&#9670;</div>
+      <h1>Gvn<span class="gradient-text">AI</span> Dictionary</h1>
+      <p>Hesabiniza giris yapin</p>
+    </div>
 
     @if (errorMessage()) {
       <div class="error-message">{{ errorMessage() }}</div>
@@ -9,41 +19,38 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="email">E-posta</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="ornek@email.com"
-        />
+        <div class="input-wrapper">
+          <span class="input-icon">&#9993;</span>
+          <input id="email" type="email" formControlName="email" placeholder="ornek@email.com" />
+        </div>
         @if (form.controls.email.touched && form.controls.email.invalid) {
-          <span class="field-error">Geçerli bir e-posta adresi girin.</span>
+          <span class="field-error">Gecerli bir e-posta adresi girin.</span>
         }
       </div>
 
       <div class="form-group">
-        <label for="password">Şifre</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="Şifreniz"
-        />
+        <label for="password">Sifre</label>
+        <div class="input-wrapper">
+          <span class="input-icon">&#128274;</span>
+          <input id="password" type="password" formControlName="password" placeholder="Sifrenizi girin" />
+        </div>
         @if (form.controls.password.touched && form.controls.password.invalid) {
-          <span class="field-error">Şifre en az 6 karakter olmalıdır.</span>
+          <span class="field-error">Sifre gereklidir.</span>
         }
       </div>
 
-      <button type="submit" class="btn-primary" [disabled]="loading()">
+      <button type="submit" class="btn btn-primary btn-lg btn-full" [disabled]="loading()">
         @if (loading()) {
-          Giriş yapılıyor...
+          <span class="spinner"></span> Giris yapiliyor...
         } @else {
-          Giriş Yap
+          Giris Yap
         }
       </button>
     </form>
 
-    <p class="link-text">
-      Hesabınız yok mu? <a routerLink="/register">Kayıt olun</a>
-    </p>
+    <div class="auth-footer">
+      <span>Hesabiniz yok mu?</span>
+      <a routerLink="/register">Kayit Olun</a>
+    </div>
   </div>
 </div>

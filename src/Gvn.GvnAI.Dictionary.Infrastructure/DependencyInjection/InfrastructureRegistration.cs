@@ -33,12 +33,28 @@ public static class InfrastructureRegistration
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRepository<Translation>, EfRepository<Translation, DictionaryDbContext>>();
         services.AddScoped<IRepository<Example>, EfRepository<Example, DictionaryDbContext>>();
+        services.AddScoped<IRepository<Pronunciation>, EfRepository<Pronunciation, DictionaryDbContext>>();
+        services.AddScoped<IRepository<Etymology>, EfRepository<Etymology, DictionaryDbContext>>();
+
+        // Quiz
+        services.AddScoped<IRepository<QuizSession>, EfRepository<QuizSession, DictionaryDbContext>>();
+        services.AddScoped<IRepository<QuizAnswer>, EfRepository<QuizAnswer, DictionaryDbContext>>();
 
         // Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork<DictionaryDbContext>>();
 
         // AI Service
         services.AddScoped<IAiDictionaryService, ClaudeAiDictionaryService>();
+
+        // Favorites
+        services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+        services.AddScoped<IFavoriteQueryService, FavoriteQueryService>();
+
+        // Profile
+        services.AddScoped<IProfileQueryService, ProfileQueryService>();
+
+        // Quiz Service
+        services.AddScoped<IQuizService, QuizService>();
 
         return services;
     }

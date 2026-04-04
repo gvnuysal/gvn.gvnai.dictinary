@@ -83,6 +83,33 @@ namespace Gvn.GvnAI.Dictionary.Infrastructure.Migrations
                     b.ToTable("examples", (string)null);
                 });
 
+            modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.Favorite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("WordId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WordId");
+
+                    b.HasIndex("UserId", "WordId")
+                        .IsUnique();
+
+                    b.ToTable("favorites", (string)null);
+                });
+
             modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.Language", b =>
                 {
                     b.Property<Guid>("Id")
@@ -174,6 +201,95 @@ namespace Gvn.GvnAI.Dictionary.Infrastructure.Migrations
                     b.HasIndex("WordId");
 
                     b.ToTable("pronunciations", (string)null);
+                });
+
+            modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.QuizAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("AnsweredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CorrectTranslationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsCorrect")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PointsEarned")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("QuizSessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ResponseTimeMs")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("SelectedTranslationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("WordId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuizSessionId");
+
+                    b.HasIndex("WordId");
+
+                    b.ToTable("quiz_answers", (string)null);
+                });
+
+            modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.QuizSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CorrectCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("TotalQuestions")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalScore")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("WrongCount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("quiz_sessions", (string)null);
                 });
 
             modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.Register", b =>
@@ -551,12 +667,51 @@ namespace Gvn.GvnAI.Dictionary.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
                 });
 
+            modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.Favorite", b =>
+                {
+                    b.HasOne("Gvn.GvnAI.Dictionary.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gvn.GvnAI.Dictionary.Domain.Entities.Word", null)
+                        .WithMany()
+                        .HasForeignKey("WordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.Pronunciation", b =>
                 {
                     b.HasOne("Gvn.GvnAI.Dictionary.Domain.Entities.Word", null)
                         .WithMany("Pronunciations")
                         .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.QuizAnswer", b =>
+                {
+                    b.HasOne("Gvn.GvnAI.Dictionary.Domain.Entities.QuizSession", null)
+                        .WithMany("Answers")
+                        .HasForeignKey("QuizSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gvn.GvnAI.Dictionary.Domain.Entities.Word", null)
+                        .WithMany()
+                        .HasForeignKey("WordId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.QuizSession", b =>
+                {
+                    b.HasOne("Gvn.GvnAI.Dictionary.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -662,6 +817,11 @@ namespace Gvn.GvnAI.Dictionary.Infrastructure.Migrations
                         .HasForeignKey("TargetWordId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.QuizSession", b =>
+                {
+                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.Sense", b =>

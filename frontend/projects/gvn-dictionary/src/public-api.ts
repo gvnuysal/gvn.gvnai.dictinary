@@ -24,3 +24,5 @@ export * from './lib/modules/dictionary/components/word-form/word-form.component
 export * from './lib/modules/dictionary/components/sense-form/sense-form.component';
 export * from './lib/modules/dictionary/components/translation-form/translation-form.component';
 export * from './lib/modules/dictionary/components/example-form/example-form.component';
+export * from './lib/modules/dictionary/components/quiz/quiz.component';
+export * from './lib/modules/dictionary/components/profile/profile.component';

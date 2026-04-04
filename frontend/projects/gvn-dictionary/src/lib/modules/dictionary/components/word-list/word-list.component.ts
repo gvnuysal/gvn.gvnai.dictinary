@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WordService } from '../../../../services/word.service';
 import { LookupService } from '../../../../services/lookup.service';
@@ -11,7 +12,7 @@ import { PagedResult } from '../../../../models/paged-result.model';
 @Component({
   selector: 'dict-word-list',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, UpperCasePipe],
   templateUrl: './word-list.component.html',
   styleUrl: './word-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +35,22 @@ export class WordListComponent implements OnInit {
   readonly totalCount = signal(0);
   readonly hasPreviousPage = signal(false);
   readonly hasNextPage = signal(false);
+
+  readonly pageNumbers = computed(() => {
+    const total = this.totalPages();
+    const current = this.pageNumber();
+    const pages: number[] = [];
+    const maxVisible = 5;
+    let start = Math.max(1, current - Math.floor(maxVisible / 2));
+    let end = Math.min(total, start + maxVisible - 1);
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  });
 
   ngOnInit(): void {
     this.isAuthenticated.set(this.authService.isAuthenticated());
@@ -93,10 +110,10 @@ export class WordListComponent implements OnInit {
   getStatusLabel(status: WordStatus): string {
     const labels: Record<WordStatus, string> = {
       [WordStatus.Pending]: 'Bekliyor',
-      [WordStatus.Enriched]: 'Zenginleştirildi',
-      [WordStatus.Failed]: 'Başarısız',
-      [WordStatus.Approved]: 'Onaylandı',
-      [WordStatus.Archived]: 'Arşivlendi',
+      [WordStatus.Enriched]: 'Zenginlestirildi',
+      [WordStatus.Failed]: 'Basarisiz',
+      [WordStatus.Approved]: 'Onaylandi',
+      [WordStatus.Archived]: 'Arsivlendi',
     };
     return labels[status] ?? 'Bilinmiyor';
   }
@@ -110,5 +127,16 @@ export class WordListComponent implements OnInit {
       [WordStatus.Archived]: 'badge-secondary',
     };
     return classes[status] ?? 'badge-secondary';
+  }
+
+  getStatusDotClass(status: WordStatus): string {
+    const classes: Record<WordStatus, string> = {
+      [WordStatus.Pending]: 'warning',
+      [WordStatus.Enriched]: 'info',
+      [WordStatus.Failed]: 'danger',
+      [WordStatus.Approved]: 'success',
+      [WordStatus.Archived]: 'neutral',
+    };
+    return classes[status] ?? 'neutral';
   }
 }

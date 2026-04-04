@@ -32,5 +32,15 @@ export const routes: Routes = [
     path: 'words/:id/edit',
     loadComponent: () => import('gvn-dictionary').then(m => m.WordFormComponent),
     canActivate: [authGuard]
+  },
+  {
+    path: 'quiz',
+    loadComponent: () => import('gvn-dictionary').then(m => m.QuizComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'profile',
+    loadComponent: () => import('gvn-dictionary').then(m => m.ProfileComponent),
+    canActivate: [authGuard]
   }
 ];

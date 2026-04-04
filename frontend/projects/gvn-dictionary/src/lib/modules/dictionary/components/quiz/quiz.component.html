@@ -1,0 +1,168 @@
+<!-- IDLE STATE -->
+@if (gameState() === 'idle') {
+  <div class="page-container">
+    <div class="quiz-start glass-card-static animate-in">
+      <div class="quiz-hero">
+        <div class="quiz-icon">&#127919;</div>
+        <h1>Kelime <span class="gradient-text">Oyunu</span></h1>
+        <p class="quiz-subtitle">Ingilizce kelimelerin Turkce karsiliklarini bulun</p>
+        <div class="quiz-rules">
+          <div class="rule">
+            <span class="rule-icon success">&#10003;</span>
+            <span>Dogru cevap: <strong>+5 puan</strong></span>
+          </div>
+          <div class="rule">
+            <span class="rule-icon danger">&#10007;</span>
+            <span>Yanlis cevap: <strong>-3 puan</strong></span>
+          </div>
+          <div class="rule">
+            <span class="rule-icon warning">&#9201;</span>
+            <span>Sure: <strong>10 saniye</strong></span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg start-btn" (click)="startGame()" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span> Baslatiliyor...
+          } @else {
+            &#127918; Oyuna Basla
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- PLAYING / ANSWERED STATE -->
+@if (gameState() === 'playing' || gameState() === 'answered') {
+  <div class="page-container">
+    <div class="quiz-playing animate-in">
+      <!-- Header: Score + Question # + Timer -->
+      <div class="quiz-header">
+        <div class="quiz-stats">
+          <div class="stat">
+            <span class="stat-label">Puan</span>
+            <span class="stat-value" [class.positive]="totalScore() >= 0" [class.negative]="totalScore() < 0">{{ totalScore() }}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Soru</span>
+            <span class="stat-value">{{ questionNumber() }}</span>
+          </div>
+          <div class="stat correct">
+            <span class="stat-label">Dogru</span>
+            <span class="stat-value">{{ correctCount() }}</span>
+          </div>
+          <div class="stat wrong">
+            <span class="stat-label">Yanlis</span>
+            <span class="stat-value">{{ wrongCount() }}</span>
+          </div>
+        </div>
+        <div class="timer-ring" [class.urgent]="countdown() <= 3">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" class="timer-bg" />
+            <circle cx="50" cy="50" r="45" class="timer-progress" [style.stroke-dashoffset]="timerOffset()" />
+          </svg>
+          <span class="timer-text">{{ countdown() }}</span>
+        </div>
+      </div>
+
+      <!-- Word Card -->
+      <div class="word-question glass-card-static">
+        <span class="badge badge-accent">EN</span>
+        <h2 class="question-word">{{ question()?.lemma }}</h2>
+        <p class="question-definition">{{ question()?.definition }}</p>
+      </div>
+
+      <!-- Options Grid -->
+      <div class="options-grid">
+        @for (option of question()?.options; track option.id) {
+          <button class="option-card glass-card"
+                  [class.selected]="selectedOptionId() === option.id"
+                  [class.correct]="gameState() === 'answered' && option.id === answerResult()?.correctOptionId"
+                  [class.wrong]="gameState() === 'answered' && selectedOptionId() === option.id && !answerResult()?.isCorrect"
+                  [class.timeout-wrong]="gameState() === 'answered' && !selectedOptionId() && option.id !== answerResult()?.correctOptionId"
+                  [disabled]="gameState() === 'answered'"
+                  (click)="selectOption(option.id)">
+            <span class="option-text">{{ option.text }}</span>
+            @if (gameState() === 'answered' && option.id === answerResult()?.correctOptionId) {
+              <span class="option-icon correct-icon">&#10003;</span>
+            }
+            @if (gameState() === 'answered' && selectedOptionId() === option.id && !answerResult()?.isCorrect) {
+              <span class="option-icon wrong-icon">&#10007;</span>
+            }
+          </button>
+        }
+      </div>
+
+      <!-- Answer Feedback -->
+      @if (gameState() === 'answered') {
+        <div class="answer-feedback animate-in" [class.correct]="answerResult()?.isCorrect" [class.wrong]="!answerResult()?.isCorrect">
+          @if (answerResult()?.isCorrect) {
+            <span>&#127881; Dogru! +5 puan</span>
+          } @else if (selectedOptionId()) {
+            <span>&#128532; Yanlis! -3 puan</span>
+          } @else {
+            <span>&#9200; Sure doldu! -3 puan</span>
+          }
+        </div>
+      }
+
+      <!-- Quit button -->
+      <div class="quiz-actions">
+        <button class="btn btn-ghost btn-sm" (click)="finishGame()" [disabled]="loading()">Oyunu Bitir</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- FINISHED STATE -->
+@if (gameState() === 'finished' && quizResult()) {
+  <div class="page-container">
+    <div class="quiz-finished glass-card-static animate-in">
+      <div class="result-header">
+        <div class="result-icon">{{ quizResult()!.accuracy >= 70 ? '&#127942;' : quizResult()!.accuracy >= 40 ? '&#128077;' : '&#128170;' }}</div>
+        <h1>Oyun Bitti!</h1>
+        <div class="final-score gradient-text">{{ quizResult()?.totalScore }} Puan</div>
+      </div>
+
+      <div class="result-stats">
+        <div class="result-stat">
+          <span class="label">Toplam Soru</span>
+          <span class="value">{{ quizResult()?.totalQuestions }}</span>
+        </div>
+        <div class="result-stat correct">
+          <span class="label">Dogru</span>
+          <span class="value">{{ quizResult()?.correctCount }}</span>
+        </div>
+        <div class="result-stat wrong">
+          <span class="label">Yanlis</span>
+          <span class="value">{{ quizResult()?.wrongCount }}</span>
+        </div>
+        <div class="result-stat">
+          <span class="label">Basari</span>
+          <span class="value">%{{ (quizResult()?.accuracy ?? 0) | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <!-- Answer history -->
+      <div class="answer-history">
+        <h3>Cevap Gecmisi</h3>
+        @for (a of quizResult()?.answers; track $index) {
+          <div class="history-item" [class.correct]="a.isCorrect" [class.wrong]="!a.isCorrect">
+            <span class="history-word">{{ a.wordLemma }}</span>
+            <span class="history-arrow">&#8594;</span>
+            <span class="history-answer">{{ a.selectedTranslation ?? '(sure doldu)' }}</span>
+            @if (!a.isCorrect) {
+              <span class="history-correct">({{ a.correctTranslation }})</span>
+            }
+            <span class="history-points" [class.positive]="a.pointsEarned > 0">{{ a.pointsEarned > 0 ? '+' : '' }}{{ a.pointsEarned }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="result-actions">
+        <button class="btn btn-primary btn-lg" (click)="startGame()" [disabled]="loading()">&#128260; Tekrar Oyna</button>
+        <a routerLink="/words" class="btn btn-ghost">Kelimelere Don</a>
+      </div>
+    </div>
+  </div>
+}

@@ -7,4 +7,5 @@ public interface ISenseRepository : IRepository<Sense>
 {
     Task<int> GetMaxSenseNumberAsync(Guid wordId, CancellationToken cancellationToken = default);
     Task<Sense?> GetByIdWithTranslationsAsync(Guid id, CancellationToken cancellationToken = default);
+    Task DeleteAllByWordIdAsync(Guid wordId, CancellationToken cancellationToken = default);
 }

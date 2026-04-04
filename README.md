@@ -15,6 +15,19 @@
 
 ---
 
+## Öne Çıkan Özellikler
+
+- **Word → Sense → Translation** mimarisi (profesyonel sözlük standardı)
+- **Claude AI ile otomatik zenginleştirme** (anlam, çeviri, örnek, telaffuz, köken)
+- **Kelime Oyunu** — İngilizce kelimeden Türkçe karşılığını bul (+5/-3 puan, 10 saniye süre)
+- **Kullanıcı Profili** — Oyun istatistikleri, favori kelimeler, profil düzenleme
+- **Favori Sistemi** — Kelimeleri favorilere ekle/çıkar
+- **Glassmorphism UI** — Modern dark theme, animasyonlu kartlar
+- **JWT Kimlik Doğrulama** — Güvenli API erişimi
+- **Clean Architecture** — DDD, CQRS, MediatR, FluentValidation
+
+---
+
 ## Mimariye Genel Bakış
 
 ```
@@ -46,8 +59,6 @@
 
 ## Sözlük Veri Modeli
 
-Profesyonel sözlüklerin kullandığı **Word → Sense → Translation** mimarisi:
-
 ```
 Word: "run" (VERB, English)
 │
@@ -68,39 +79,99 @@ Word: "run" (VERB, English)
 └── Etymology: Old English "rinnan"
 ```
 
-### Entity İlişki Diyagramı
+---
+
+## Kelime Oyunu
+
+İngilizce kelimenin Türkçe karşılığını bul! Sistemdeki tüm kelimelerden rastgele sorular.
 
 ```
-┌──────────────┐     ┌──────────────┐     ┌──────────────────┐
-│   Language    │     │ PartOfSpeech │     │    Register      │
-│ (tr, en, de) │     │(NOUN,VERB..) │     │(formal, slang..) │
-└──────┬───────┘     └──────┬───────┘     └────────┬─────────┘
-       │                    │                       │
-       │  ┌─────────────────┼───────────────────────┘
-       │  │                 │
-┌──────▼──▼─────────────────▼──┐
-│           WORD               │
-│  lemma, status, frequency,   │
-│  difficulty, isCompound...   │
-│  (AggregateRoot, SoftDelete) │
-└──────┬───────────┬───────────┘
-       │           │
-┌──────▼───┐ ┌─────▼──────────┐  ┌──────────────┐
-│ Pronun.  │ │   SENSE        │  │  Etymology   │
-│ (IPA)    │ │  definition,   │  │  (origin)    │
-└──────────┘ │  senseNumber   │  └──────────────┘
-             └──┬─────────┬───┘
-                │         │
-      ┌─────────▼──┐ ┌───▼──────────┐
-      │ TRANSLATION│ │   EXAMPLE    │
-      │ text, eq., │ │ sourceText,  │
-      │ confidence │ │ targetText   │
-      └────────────┘ └──────────────┘
+┌─────────────────────────────────────────────────┐
+│  Puan: 25    Soru: 6    Doğru: 5    Yanlış: 1  │
+│                                          ┌────┐ │
+│                                          │ 7  │ │  ← 10 sn geri sayım
+│                                          └────┘ │
+│         ┌──────────────────────────┐            │
+│         │  EN   beautiful          │            │  ← İngilizce kelime
+│         │  "Pleasing to senses"    │            │
+│         └──────────────────────────┘            │
+│                                                 │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐    │
+│   │  güzel   │  │  hızlı   │  │  büyük   │    │  ← 5 Türkçe seçenek
+│   │  ✓ ████ │  │          │  │          │    │
+│   └──────────┘  └──────────┘  └──────────┘    │
+│   ┌──────────┐  ┌──────────┐                   │
+│   │  küçük   │  │  kolay   │                   │
+│   └──────────┘  └──────────┘                   │
+│                                                 │
+│   🎉 Doğru! +5 puan                            │
+└─────────────────────────────────────────────────┘
+```
+
+**Kurallar:**
+- Doğru cevap: **+5 puan**
+- Yanlış cevap / süre dolması: **-3 puan**
+- Süre: **10 saniye** (SVG dairesel geri sayım)
+- Sınırsız soru — istediğiniz zaman bitirin
+- Tüm sonuçlar veritabanında saklanır
+
+---
+
+## Kullanıcı Profili
+
+```
+┌─────────────────────────────────────────────────┐
+│  ┌──┐                                           │
+│  │GU│  Güven Uysal                  ✏ Düzenle  │
+│  └──┘  admin@gvn.dev                             │
+│        🏷 User   📅 Üye: 02.04.2026             │
+├─────────────────────────────────────────────────┤
+│                                                  │
+│  🏆 25       🎮 3        ✅ 8       ❌ 2       │
+│  Toplam     Oyun       Doğru     Yanlış        │
+│  Puan       Sayısı     Cevap     Cevap         │
+│                                                  │
+│  🎯 %80     ⭐ 15      ❓ 10      ♥ 5          │
+│  Başarı    En İyi     Toplam    Favori         │
+│  Oranı     Skor       Soru      Kelime         │
+├─────────────────────────────────────────────────┤
+│  Favori Kelimeler                                │
+│  ┌────────┐ ┌────────┐ ┌────────┐              │
+│  │love ADJ│ │run VERB│ │time N. │              │
+│  │→ aşk   │ │→ koşmak│ │→ zaman │              │
+│  └────────┘ └────────┘ └────────┘              │
+└─────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Veritabanı Tabloları
+## AI Zenginleştirme
+
+Claude AI ile kelimeler otomatik zenginleştirilebilir:
+
+```
+Önce:                              Sonra:
+┌──────────────────┐               ┌─────────────────────────────────┐
+│ love (NOUN, EN)  │               │ love (NOUN, EN)                │
+│ Status: Pending  │   Claude AI   │ Status: Enriched               │
+│ Senses: []       │ ────────────► │                                │
+│ Pronunciation: - │               │ Sense 1: "Deep affection"      │
+│ Etymology: -     │               │   → aşk (TR, Exact, %95)      │
+└──────────────────┘               │   → sevgi (TR, Near, %90)     │
+                                   │   📝 "Love is powerful."      │
+                                   │                                │
+                                   │ Sense 2: "Strong liking"      │
+                                   │   → tutku (TR, Near, %85)     │
+                                   │   📝 "A love for music."      │
+                                   │                                │
+                                   │ 🔊 /lʌv/ (IPA)               │
+                                   │ 📜 Old English "lufu"         │
+                                   └─────────────────────────────────┘
+```
+
+---
+
+## Veritabanı Tabloları (17 tablo)
 
 | Tablo | Açıklama | Tip |
 |-------|----------|-----|
@@ -114,10 +185,13 @@ Word: "run" (VERB, English)
 | `parts_of_speech` | Sözcük türleri (NOUN, VERB...) | Lookup |
 | `registers` | Kullanım kaydı (formal, slang...) | Lookup |
 | `domains` | Konu alanı (medicine, law...) | Lookup |
-| `sense_synonyms` | Anlam düzeyinde eş anlamlılar | İlişki |
-| `sense_antonyms` | Anlam düzeyinde zıt anlamlılar | İlişki |
-| `word_relationships` | Kelime ilişkileri (türetme, üst kavram) | İlişki |
+| `sense_synonyms` | Eş anlamlılar | İlişki |
+| `sense_antonyms` | Zıt anlamlılar | İlişki |
+| `word_relationships` | Kelime ilişkileri | İlişki |
 | `Users` | Kullanıcı hesapları | AggregateRoot |
+| `quiz_sessions` | Oyun oturumları | AggregateRoot |
+| `quiz_answers` | Oyun cevapları | Entity |
+| `favorites` | Favori kelimeler | Entity |
 
 ---
 
@@ -128,37 +202,24 @@ Word: "run" (VERB, English)
 | Teknoloji | Versiyon | Kullanım |
 |-----------|----------|----------|
 | .NET | 10.0 | Runtime |
-| ASP.NET Core | 10.0 | Web API Framework |
+| ASP.NET Core | 10.0 | Web API |
 | Entity Framework Core | 10.0.5 | ORM |
 | PostgreSQL | 17 | Veritabanı |
-| MediatR | 12.4.1 | CQRS / Mediator |
+| MediatR | 12.4.1 | CQRS |
 | FluentValidation | 11.11.0 | Doğrulama |
-| Anthropic SDK | 3.3.0 | Claude AI Entegrasyonu |
+| Anthropic SDK | 3.3.0 | Claude AI |
 | Hangfire | 1.8+ | Arka Plan Görevleri |
-| Serilog | 9.x | Yapılandırılmış Loglama |
+| Serilog | 9.x | Loglama |
 | Scalar | 2.x | API Dokümantasyonu |
-| JWT Bearer | - | Kimlik Doğrulama |
 
 ### Frontend
 
 | Teknoloji | Versiyon | Kullanım |
 |-----------|----------|----------|
 | Angular | 21.2 | UI Framework |
-| TypeScript | 5.9 | Programlama Dili |
+| TypeScript | 5.9 | Dil |
 | RxJS | 7.8 | Reaktif Programlama |
-| ng-packagr | 21.2 | Library Build |
-| SCSS | - | Stil |
-
-### Altyapı
-
-| Servis | Adres | Açıklama |
-|--------|-------|----------|
-| API | `http://localhost:5050` | REST API |
-| Frontend | `http://localhost:4200` | Angular SPA |
-| PostgreSQL | `localhost:5432` | Veritabanı |
-| Redis | `localhost:6379` | Cache (opsiyonel) |
-| Scalar UI | `/scalar/v1` | API Dokümantasyonu |
-| Hangfire | `/hangfire` | İş Dashboard'u |
+| SCSS | - | Glassmorphism Dark Theme |
 
 ---
 
@@ -168,37 +229,52 @@ Word: "run" (VERB, English)
 gvn.gvnai.dictinary/
 │
 ├── src/                                       ← .NET Backend (Clean Architecture)
-│   ├── Gvn.GvnAI.Dictionary.API/             ← Presentation Layer
-│   │   ├── Controllers/                       ← 6 controller (Words, Senses, Translations...)
-│   │   ├── Program.cs                         ← Startup + middleware
-│   │   └── appsettings.json
-│   ├── Gvn.GvnAI.Dictionary.Application/     ← Application Layer (CQRS)
-│   │   ├── Features/                          ← Commands & Queries
-│   │   ├── DTOs/                              ← Data Transfer Objects
-│   │   └── Mappings/                          ← Entity → DTO
-│   ├── Gvn.GvnAI.Dictionary.Domain/          ← Domain Layer (DDD)
-│   │   ├── Entities/                          ← 14 entity (Word, Sense, Translation...)
-│   │   ├── Events/                            ← Domain events
-│   │   └── Repositories/                      ← Interfaces
-│   ├── Gvn.GvnAI.Dictionary.Domain.Shared/   ← Shared Kernel
-│   │   ├── Enums/                             ← 7 enum
-│   │   └── Errors/                            ← Domain errors
-│   └── Gvn.GvnAI.Dictionary.Infrastructure/  ← Infrastructure Layer
-│       ├── Persistence/                       ← EF Core, 13 configuration
-│       ├── Services/ClaudeAiDictionaryService ← AI entegrasyonu
-│       └── Jobs/EnrichPendingWordsJob         ← Toplu AI zenginleştirme
+│   ├── Gvn.GvnAI.Dictionary.API/             ← 8 Controller
+│   │   └── Controllers/
+│   │       ├── WordsController.cs             ← Kelime CRUD + AI Enrich
+│   │       ├── SensesController.cs            ← Anlam yönetimi
+│   │       ├── TranslationsController.cs      ← Çeviri yönetimi
+│   │       ├── ExamplesController.cs          ← Örnek yönetimi
+│   │       ├── QuizController.cs              ← Oyun (start, next, answer, complete)
+│   │       ├── FavoritesController.cs         ← Favori kelimeler
+│   │       ├── ProfileController.cs           ← Profil + istatistikler
+│   │       ├── LookupsController.cs           ← Referans veriler
+│   │       └── AuthController.cs              ← Kimlik doğrulama
+│   ├── Gvn.GvnAI.Dictionary.Application/     ← CQRS Features
+│   │   └── Features/
+│   │       ├── Words/                         ← Create, Update, Delete, Enrich, Search
+│   │       ├── Senses/                        ← Add, Update, Remove
+│   │       ├── Translations/                  ← Add, Remove
+│   │       ├── Examples/                      ← Add, Remove
+│   │       ├── Quiz/                          ← Start, SubmitAnswer, Complete, Leaderboard
+│   │       ├── Favorites/                     ← Add, Remove, List
+│   │       ├── Profile/                       ← Get, Update
+│   │       ├── Lookups/                       ← GetLookups
+│   │       └── Auth/                          ← Register, Login
+│   ├── Gvn.GvnAI.Dictionary.Domain/          ← 16 Entity
+│   ├── Gvn.GvnAI.Dictionary.Domain.Shared/   ← 7 Enum, Constants, Errors
+│   └── Gvn.GvnAI.Dictionary.Infrastructure/  ← EF Core, Claude AI, Hangfire
 │
 ├── frontend/                                  ← Angular Frontend
 │   ├── src/app/                               ← Root app (routing, navbar)
 │   └── projects/gvn-dictionary/               ← Angular Library
 │       └── src/lib/
-│           ├── models/                        ← TypeScript DTO'lar
-│           ├── services/                      ← API servisleri (7 service)
+│           ├── models/                        ← 8 model dosyası
+│           ├── services/                      ← 9 service (auth, word, quiz, favorite, profile...)
 │           ├── guards/                        ← Auth guard
 │           ├── interceptors/                  ← JWT interceptor
 │           └── modules/
 │               ├── auth/                      ← Login, Register
-│               └── dictionary/                ← 7 component (list, detail, search, forms)
+│               └── dictionary/                ← 9 component
+│                   ├── word-list/             ← Kart grid, filtre, sayfalama
+│                   ├── word-detail/           ← Hero + Sense kartları + Favori
+│                   ├── word-search/           ← Arama + filtreler
+│                   ├── word-form/             ← EN kelime + TR çeviri formu
+│                   ├── quiz/                  ← Kelime oyunu (timer, skor, animasyonlar)
+│                   ├── profile/               ← Profil + istatistikler + favoriler
+│                   ├── sense-form/            ← Anlam ekleme
+│                   ├── translation-form/      ← Çeviri ekleme
+│                   └── example-form/          ← Örnek ekleme
 │
 └── README.md
 ```
@@ -207,12 +283,14 @@ gvn.gvnai.dictinary/
 
 ## API Endpoint'leri
 
-### Kimlik Doğrulama
+### Kimlik Doğrulama & Profil
 
 | Method | Endpoint | Açıklama | Auth |
 |--------|----------|----------|:----:|
 | `POST` | `/api/auth/register` | Kullanıcı kaydı | - |
-| `POST` | `/api/auth/login` | Giriş (JWT token al) | - |
+| `POST` | `/api/auth/login` | Giriş (JWT token) | - |
+| `GET` | `/api/profile` | Profil + oyun istatistikleri | JWT |
+| `PUT` | `/api/profile` | Profil güncelle | JWT |
 
 ### Kelimeler
 
@@ -221,7 +299,6 @@ gvn.gvnai.dictinary/
 | `GET` | `/api/words` | Kelime listesi (sayfalı) | - |
 | `GET` | `/api/words/{id}` | Kelime detayı (tam hiyerarşi) | - |
 | `GET` | `/api/words/search?q=&lang=&pos=` | Gelişmiş arama | - |
-| `POST` | `/api/words` | Yeni kelime | JWT |
 | `POST` | `/api/words/with-translation` | Kelime + çeviri (tek adım) | JWT |
 | `PUT` | `/api/words/{id}` | Kelime güncelle | JWT |
 | `DELETE` | `/api/words/{id}` | Kelime sil (soft delete) | JWT |
@@ -238,6 +315,26 @@ gvn.gvnai.dictinary/
 | `DELETE` | `.../translations/{tId}` | Çeviri sil | JWT |
 | `POST` | `.../senses/{sId}/examples` | Örnek ekle | JWT |
 | `DELETE` | `.../examples/{eId}` | Örnek sil | JWT |
+
+### Kelime Oyunu
+
+| Method | Endpoint | Açıklama | Auth |
+|--------|----------|----------|:----:|
+| `POST` | `/api/quiz/start` | Yeni oyun başlat | JWT |
+| `GET` | `/api/quiz/{sessionId}/next` | Sonraki soru | JWT |
+| `POST` | `/api/quiz/{sessionId}/answer` | Cevap gönder | JWT |
+| `POST` | `/api/quiz/{sessionId}/complete` | Oyunu bitir | JWT |
+| `GET` | `/api/quiz/{sessionId}/result` | Oyun sonucu | JWT |
+| `GET` | `/api/quiz/leaderboard` | Liderlik tablosu | - |
+
+### Favoriler
+
+| Method | Endpoint | Açıklama | Auth |
+|--------|----------|----------|:----:|
+| `GET` | `/api/favorites` | Favori kelimeler | JWT |
+| `POST` | `/api/favorites/{wordId}` | Favoriye ekle | JWT |
+| `DELETE` | `/api/favorites/{wordId}` | Favoriden çıkar | JWT |
+| `GET` | `/api/favorites/{wordId}/check` | Favori durumu | JWT |
 
 ### Lookup
 
@@ -270,16 +367,14 @@ docker run -d --name gvn-postgres \
 ### 2. Veritabanını Oluştur
 
 ```bash
-# Proje dizinine git
 cd src/Gvn.GvnAI.Dictionary.API
-
-# EF Core tools yükle (ilk seferde)
 dotnet tool install --global dotnet-ef
-
-# Migration uygula
 dotnet ef database update -p ../Gvn.GvnAI.Dictionary.Infrastructure
+```
 
-# Seed data ekle
+### 3. Seed Data
+
+```bash
 docker exec gvn-postgres psql -U postgres -d GvnAIDictionary -c "
 INSERT INTO languages (\"Id\", \"Code\", \"Name\", \"NativeName\", \"Direction\") VALUES
   (gen_random_uuid(), 'tr', 'Turkish', 'Türkçe', 'LTR'),
@@ -300,101 +395,21 @@ INSERT INTO domains (\"Id\", \"Code\", \"Name\") VALUES
 "
 ```
 
-### 3. API'yi Çalıştır
+### 4. API'yi Çalıştır
 
 ```bash
 dotnet run --project src/Gvn.GvnAI.Dictionary.API
 ```
 
-> **API:** http://localhost:5050
-> **Scalar UI:** http://localhost:5050/scalar/v1
-> **Hangfire:** http://localhost:5050/hangfire
+> **API:** http://localhost:5050 | **Scalar UI:** http://localhost:5050/scalar/v1 | **Hangfire:** http://localhost:5050/hangfire
 
-### 4. Frontend'i Çalıştır
+### 5. Frontend'i Çalıştır
 
 ```bash
-cd frontend
-npm install
-ng serve
+cd frontend && npm install && ng serve
 ```
 
 > **Frontend:** http://localhost:4200
-
----
-
-## Kullanım Örnekleri
-
-### Kayıt & Giriş
-
-```bash
-# Kayıt ol
-curl -X POST http://localhost:5050/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"Pass123!","fullName":"Test User"}'
-
-# Giriş yap → JWT token al
-curl -X POST http://localhost:5050/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","password":"Pass123!"}'
-```
-
-### Kelime Ekleme (EN + TR tek adımda)
-
-```bash
-curl -X POST http://localhost:5050/api/words/with-translation \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <TOKEN>" \
-  -d '{
-    "lemma": "love",
-    "partOfSpeechId": "<NOUN_ID>",
-    "definition": "A deep feeling of affection",
-    "translationText": "aşk"
-  }'
-```
-
-### AI ile Zenginleştirme
-
-```bash
-curl -X POST "http://localhost:5050/api/words/<ID>/enrich?targetLanguageCode=tr" \
-  -H "Authorization: Bearer <TOKEN>"
-```
-
----
-
-## AI Zenginleştirme
-
-Claude AI ile kelimeler otomatik zenginleştirilebilir:
-
-```
-Önce:                              Sonra:
-┌──────────────────┐               ┌─────────────────────────────────┐
-│ love (NOUN, EN)  │               │ love (NOUN, EN)                │
-│ Status: Pending  │   Claude AI   │ Status: Enriched               │
-│ Senses: []       │ ────────────► │                                │
-│ Pronunciation: - │               │ Sense 1: "Deep affection"      │
-│ Etymology: -     │               │   → aşk (TR, Exact, %95)      │
-└──────────────────┘               │   → sevgi (TR, Near, %90)     │
-                                   │   📝 "Love is powerful."      │
-                                   │                                │
-                                   │ Sense 2: "Strong liking"      │
-                                   │   → tutku (TR, Near, %85)     │
-                                   │   📝 "A love for music."      │
-                                   │                                │
-                                   │ 🔊 /lʌv/ (IPA)               │
-                                   │ 📜 Old English "lufu"         │
-                                   └─────────────────────────────────┘
-```
-
-`appsettings.json`'da Claude API key yapılandırması:
-
-```json
-{
-  "Claude": {
-    "ApiKey": "sk-ant-...",
-    "Model": "claude-sonnet-4-20250514"
-  }
-}
-```
 
 ---
 
@@ -403,23 +418,19 @@ Claude AI ile kelimeler otomatik zenginleştirilebilir:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                      API Layer                               │
-│  Controllers, Middleware, Program.cs                          │
-│  (ASP.NET Core, Scalar, Hangfire Dashboard, CORS)            │
+│  9 Controller, Middleware, CORS, JWT                          │
 ├─────────────────────────────────────────────────────────────┤
 │                   Application Layer                          │
-│  CQRS Commands/Queries, Handlers, Validators, DTOs           │
-│  (MediatR, FluentValidation)                                 │
+│  CQRS: Words, Senses, Translations, Examples,                │
+│  Quiz, Favorites, Profile, Lookups, Auth                     │
 ├─────────────────────────────────────────────────────────────┤
 │                    Domain Layer                              │
-│  Entities, AggregateRoots, Events, Repository Interfaces     │
-│  (DDD: Word → Sense → Translation hierarchy)                 │
-├─────────────────────────────────────────────────────────────┤
-│                 Domain.Shared Layer                           │
-│  Enums, Constants, Error Definitions                         │
+│  16 Entity, Events, Repository Interfaces                    │
+│  Word → Sense → Translation hierarchy                        │
 ├─────────────────────────────────────────────────────────────┤
 │                 Infrastructure Layer                          │
-│  EF Core, PostgreSQL, Repositories, Claude AI, Hangfire      │
-│  (Npgsql, Anthropic SDK)                                     │
+│  EF Core, PostgreSQL, Claude AI, Hangfire                    │
+│  QuizService, ProfileQueryService, FavoriteQueryService       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -427,19 +438,7 @@ Claude AI ile kelimeler otomatik zenginleştirilebilir:
 
 ## Framework
 
-Bu proje **[Gvn.GvnFramework](https://github.com/gvnuysal/Gvn.GvnFramework)** altyapısı üzerine inşa edilmiştir:
-
-| Modül | Katkı |
-|-------|-------|
-| `Gvn.GvnFramework.Core` | Result pattern, Guard, Exceptions |
-| `Gvn.GvnFramework.Domain` | Entity, AggregateRoot, Repository interfaces |
-| `Gvn.GvnFramework.Application` | CQRS abstractions, MediatR pipeline |
-| `Gvn.GvnFramework.EntityFramewokCore` | EF Core repository, UnitOfWork |
-| `Gvn.GvnFramework.AspNetCore` | ApiControllerBase, Exception middleware |
-| `Gvn.GvnFramework.Security` | JWT, BCrypt, CurrentUser |
-| `Gvn.GvnFramework.Caching` | Redis / Memory cache |
-| `Gvn.GvnFramework.BackgroundJobs` | Hangfire integration |
-| `Gvn.GvnFramework.Swagger` | Scalar / OpenAPI |
+Bu proje **[Gvn.GvnFramework](https://github.com/gvnuysal/Gvn.GvnFramework)** altyapısı üzerine inşa edilmiştir.
 
 ---
 
@@ -450,5 +449,5 @@ MIT License
 ---
 
 <p align="center">
-  <sub>Built with ❤️ using Gvn.GvnFramework + Claude AI</sub>
+  <sub>Built with Gvn.GvnFramework + Claude AI</sub>
 </p>

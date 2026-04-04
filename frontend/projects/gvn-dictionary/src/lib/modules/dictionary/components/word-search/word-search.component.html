@@ -1,17 +1,24 @@
-<div class="search-container">
-  <h2>Kelime Ara</h2>
-
-  <div class="search-bar">
-    <input
-      type="text"
-      placeholder="Kelime ara..."
-      (input)="onSearchInput($any($event.target).value)"
-    />
+<div class="page-container animate-in">
+  <div class="search-hero">
+    <h1 class="gradient-text">Kelime Ara</h1>
+    <p class="search-subtitle">Sozlukte arama yapin, filtreleri kullanin</p>
+    <div class="search-bar">
+      <div class="search-input-wrapper">
+        <span class="search-icon">&#128269;</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Kelime ara..."
+          (input)="onSearchInput($any($event.target).value)"
+          autofocus
+        />
+      </div>
+    </div>
   </div>
 
-  <div class="filters">
-    <select (change)="selectedLanguageId.set($any($event.target).value); onFilterChange()">
-      <option value="">Tüm Diller</option>
+  <div class="filter-row">
+    <select class="filter-select" (change)="selectedLanguageId.set($any($event.target).value); onFilterChange()">
+      <option value="">Tum Diller</option>
       @if (lookups(); as lk) {
         @for (lang of lk.languages; track lang.id) {
           <option [value]="lang.id">{{ lang.name }}</option>
@@ -19,8 +26,8 @@
       }
     </select>
 
-    <select (change)="selectedPosId.set($any($event.target).value); onFilterChange()">
-      <option value="">Tüm Türler</option>
+    <select class="filter-select" (change)="selectedPosId.set($any($event.target).value); onFilterChange()">
+      <option value="">Tum Turler</option>
       @if (lookups(); as lk) {
         @for (pos of lk.partsOfSpeech; track pos.id) {
           <option [value]="pos.id">{{ pos.name }} ({{ pos.abbreviation }})</option>
@@ -28,8 +35,8 @@
       }
     </select>
 
-    <select (change)="selectedDomainId.set($any($event.target).value); onFilterChange()">
-      <option value="">Tüm Alanlar</option>
+    <select class="filter-select" (change)="selectedDomainId.set($any($event.target).value); onFilterChange()">
+      <option value="">Tum Alanlar</option>
       @if (lookups(); as lk) {
         @for (domain of lk.domains; track domain.id) {
           <option [value]="domain.id">{{ domain.name }}</option>
@@ -37,8 +44,8 @@
       }
     </select>
 
-    <select (change)="selectedRegisterId.set($any($event.target).value); onFilterChange()">
-      <option value="">Tüm Kayıtlar</option>
+    <select class="filter-select" (change)="selectedRegisterId.set($any($event.target).value); onFilterChange()">
+      <option value="">Tum Kayitlar</option>
       @if (lookups(); as lk) {
         @for (reg of lk.registers; track reg.id) {
           <option [value]="reg.id">{{ reg.name }}</option>
@@ -48,51 +55,42 @@
   </div>
 
   @if (loading()) {
-    <div class="loading">Aranıyor...</div>
+    <div class="loading-state"><span class="spinner"></span></div>
   } @else {
     @if (words().length > 0 || searchQuery() || selectedLanguageId() || selectedPosId() || selectedDomainId() || selectedRegisterId()) {
-      <div class="results-info">{{ totalCount() }} sonuç bulundu</div>
+      <p class="results-info">{{ totalCount() }} sonuc bulundu</p>
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Kelime</th>
-              <th>Dil</th>
-              <th>Tür</th>
-              <th>Durum</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (word of words(); track word.id) {
-              <tr (click)="navigateToDetail(word.id)" class="clickable">
-                <td class="lemma">{{ word.lemma }}</td>
-                <td>{{ word.language.code }}</td>
-                <td>{{ word.partOfSpeech.code }}</td>
-                <td>
-                  <span class="badge" [class]="getStatusClass(word.status)">
-                    {{ getStatusLabel(word.status) }}
-                  </span>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="4" class="empty">Sonuç bulunamadı.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      @if (words().length === 0) {
+        <div class="empty-state glass-card-static">
+          <div class="empty-icon">&#128270;</div>
+          <h3>Sonuc bulunamadi</h3>
+          <p>Farkli anahtar kelimeler veya filtreler deneyin.</p>
+        </div>
+      } @else {
+        <div class="word-grid">
+          @for (word of words(); track word.id) {
+            <div class="word-card glass-card" (click)="navigateToDetail(word.id)">
+              <div class="word-card-header">
+                <span class="lang-badge">{{ word.language.code | uppercase }}</span>
+                <span class="badge badge-primary">{{ word.partOfSpeech.code }}</span>
+              </div>
+              <h2 class="word-lemma">{{ word.lemma }}</h2>
+              <div class="word-card-footer">
+                <span class="status-dot" [class]="'status-' + getStatusDotClass(word.status)"></span>
+                <span class="status-text">{{ getStatusLabel(word.status) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
 
       @if (totalPages() > 1) {
         <div class="pagination">
-          <button [disabled]="!hasPreviousPage()" (click)="goToPage(pageNumber() - 1)">
-            &laquo; Önceki
-          </button>
-          <span class="page-info">{{ pageNumber() }} / {{ totalPages() }}</span>
-          <button [disabled]="!hasNextPage()" (click)="goToPage(pageNumber() + 1)">
-            Sonraki &raquo;
-          </button>
+          <button [disabled]="!hasPreviousPage()" (click)="goToPage(pageNumber() - 1)">&#8592;</button>
+          @for (p of pageNumbers(); track p) {
+            <button [class.active]="p === pageNumber()" (click)="goToPage(p)">{{ p }}</button>
+          }
+          <button [disabled]="!hasNextPage()" (click)="goToPage(pageNumber() + 1)">&#8594;</button>
         </div>
       }
     }

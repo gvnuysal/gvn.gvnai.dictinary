@@ -132,8 +132,11 @@ export class WordFormComponent implements OnInit {
 
   private extractError(err: any): string {
     if (Array.isArray(err.error)) {
-      return err.error.map((e: any) => e.message).join(', ');
+      return err.error.map((e: any) => {
+        if (e.code === 'WORD_DUPLICATE') return `"${this.form.getRawValue().lemma}" kelimesi zaten mevcut.`;
+        return e.message;
+      }).join(', ');
     }
-    return err.error?.message ?? err.error?.detail ?? 'Bir hata oluştu.';
+    return err.error?.message ?? err.error?.detail ?? 'Bir hata olustu.';
   }
 }

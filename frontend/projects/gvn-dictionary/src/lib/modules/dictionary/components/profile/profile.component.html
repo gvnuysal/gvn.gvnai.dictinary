@@ -1,0 +1,103 @@
+@if (loading()) {
+  <div class="page-container"><div class="loading-state"><span class="spinner"></span></div></div>
+} @else if (profile(); as p) {
+  <div class="page-container animate-in">
+
+    @if (successMessage()) {
+      <div class="success-message">{{ successMessage() }}</div>
+    }
+
+    <!-- Profile Header -->
+    <div class="profile-header glass-card-static">
+      <div class="avatar">{{ p.fullName.charAt(0) | uppercase }}</div>
+      <div class="profile-info">
+        @if (editing()) {
+          <form [formGroup]="form" (ngSubmit)="saveProfile()" class="edit-form">
+            <input type="text" formControlName="fullName" class="name-input" />
+            <div class="edit-actions">
+              <button type="submit" class="btn btn-primary btn-sm" [disabled]="saving()">Kaydet</button>
+              <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEdit()">Iptal</button>
+            </div>
+          </form>
+        } @else {
+          <h1>{{ p.fullName }}</h1>
+          <button class="btn btn-ghost btn-sm edit-btn" (click)="startEdit()">&#9998; Duzenle</button>
+        }
+        <p class="email">{{ p.email }}</p>
+        <div class="meta">
+          <span class="badge badge-primary">{{ p.role }}</span>
+          <span class="member-since">Uye: {{ p.memberSince | date:'mediumDate' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <h2 class="section-title">Oyun Istatistikleri</h2>
+    <div class="stats-grid">
+      <div class="stat-card glass-card-static">
+        <div class="stat-icon">&#127942;</div>
+        <div class="stat-value gradient-text">{{ p.stats.totalScore }}</div>
+        <div class="stat-label">Toplam Puan</div>
+      </div>
+      <div class="stat-card glass-card-static">
+        <div class="stat-icon">&#127918;</div>
+        <div class="stat-value">{{ p.stats.totalGamesPlayed }}</div>
+        <div class="stat-label">Oyun Sayisi</div>
+      </div>
+      <div class="stat-card glass-card-static">
+        <div class="stat-icon">&#9989;</div>
+        <div class="stat-value correct">{{ p.stats.totalCorrect }}</div>
+        <div class="stat-label">Dogru Cevap</div>
+      </div>
+      <div class="stat-card glass-card-static">
+        <div class="stat-icon">&#10060;</div>
+        <div class="stat-value wrong">{{ p.stats.totalWrong }}</div>
+        <div class="stat-label">Yanlis Cevap</div>
+      </div>
+      <div class="stat-card glass-card-static">
+        <div class="stat-icon">&#127919;</div>
+        <div class="stat-value">%{{ p.stats.averageAccuracy | number:'1.0-1' }}</div>
+        <div class="stat-label">Basari Orani</div>
+      </div>
+      <div class="stat-card glass-card-static">
+        <div class="stat-icon">&#11088;</div>
+        <div class="stat-value">{{ p.stats.bestGameScore }}</div>
+        <div class="stat-label">En Iyi Skor</div>
+      </div>
+      <div class="stat-card glass-card-static">
+        <div class="stat-icon">&#10067;</div>
+        <div class="stat-value">{{ p.stats.totalQuestionsAnswered }}</div>
+        <div class="stat-label">Toplam Soru</div>
+      </div>
+      <div class="stat-card glass-card-static">
+        <div class="stat-icon">&#9829;</div>
+        <div class="stat-value fav">{{ p.stats.favoriteWordsCount }}</div>
+        <div class="stat-label">Favori Kelime</div>
+      </div>
+    </div>
+
+    <!-- Favorites -->
+    <h2 class="section-title">Favori Kelimeler</h2>
+    @if (favorites().length === 0) {
+      <div class="empty-state glass-card-static">
+        <p>Henuz favori kelime eklemediniz.</p>
+        <a routerLink="/words" class="btn btn-primary btn-sm">Kelimelere Git</a>
+      </div>
+    } @else {
+      <div class="favorites-grid">
+        @for (fav of favorites(); track fav.wordId) {
+          <div class="fav-card glass-card">
+            <a [routerLink]="['/words', fav.wordId]" class="fav-link">
+              <span class="fav-lemma">{{ fav.lemma }}</span>
+              <span class="badge badge-accent">{{ fav.partOfSpeech.code }}</span>
+            </a>
+            @if (fav.firstTranslation) {
+              <span class="fav-translation">{{ fav.firstTranslation }}</span>
+            }
+            <button class="btn-remove" (click)="removeFavorite(fav.wordId)">&#10005;</button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

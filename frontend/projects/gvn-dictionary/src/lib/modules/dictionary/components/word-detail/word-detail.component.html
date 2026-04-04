@@ -1,186 +1,213 @@
 @if (loading()) {
-  <div class="loading">Yükleniyor...</div>
+  <div class="page-container animate-in">
+    <div class="loading-state"><span class="spinner"></span></div>
+  </div>
 } @else if (errorMessage()) {
-  <div class="error-container">
+  <div class="page-container animate-in">
     <div class="error-message">{{ errorMessage() }}</div>
   </div>
 } @else if (word(); as w) {
-  <div class="word-detail">
-    <!-- Word Header -->
-    <div class="card word-header">
-      <div class="header-top">
-        <div>
-          <h1>{{ w.lemma }}</h1>
-          <div class="meta">
-            <span class="badge badge-lang">{{ w.language.name }} ({{ w.language.code }})</span>
-            <span class="badge badge-pos">{{ w.partOfSpeech.name }}</span>
-            <span class="badge" [class]="getStatusClass(w.status)">{{ getStatusLabel(w.status) }}</span>
+  <div class="page-container animate-in">
+    <!-- Hero Section -->
+    <div class="word-hero glass-card-static">
+      <div class="hero-top">
+        <div class="hero-info">
+          <h1 class="gradient-text hero-lemma">{{ w.lemma }}</h1>
+          <div class="hero-badges">
+            <span class="lang-badge">{{ w.language.name }} ({{ w.language.code }})</span>
+            <span class="badge badge-accent">{{ w.partOfSpeech.name }}</span>
+            <span class="badge" [class]="getStatusBadgeClass(w.status)">{{ getStatusLabel(w.status) }}</span>
             @if (w.difficultyLevel != null) {
-              <span class="badge badge-difficulty">{{ getDifficultyLabel(w.difficultyLevel) }}</span>
+              <span class="badge badge-neutral">{{ getDifficultyLabel(w.difficultyLevel) }}</span>
             }
           </div>
-          <div class="flags">
-            @if (w.isCompound) { <span class="tag">Bileşik</span> }
-            @if (w.isIdiom) { <span class="tag">Deyim</span> }
-            @if (w.isProperNoun) { <span class="tag">Özel Ad</span> }
-            @if (w.frequencyRank != null) { <span class="tag">Sıklık: {{ w.frequencyRank }}</span> }
+          <div class="hero-flags">
+            @if (w.isCompound) { <span class="flag-tag">Bilesik</span> }
+            @if (w.isIdiom) { <span class="flag-tag">Deyim</span> }
+            @if (w.isProperNoun) { <span class="flag-tag">Ozel Ad</span> }
+            @if (w.frequencyRank != null) { <span class="flag-tag">Siklik: {{ w.frequencyRank }}</span> }
           </div>
         </div>
 
         @if (isAuthenticated()) {
-          <div class="header-actions">
-            <button class="btn-ai" (click)="enrichWord()" [disabled]="enriching()">
-              @if (enriching()) { Zenginleştiriliyor... } @else { AI ile Zenginleştir }
+          <div class="hero-actions">
+            <button class="btn btn-favorite btn-sm" [class.active]="isFavorite()" (click)="toggleFavorite()">
+              {{ isFavorite() ? '&#9829;' : '&#9825;' }}
             </button>
-            <button class="btn-edit" (click)="editWord()">Düzenle</button>
-            <button class="btn-danger" (click)="deleteWord()">Sil</button>
+            <button class="btn btn-ai-enrich" (click)="enrichWord()" [disabled]="enriching()">
+              @if (enriching()) {
+                <span class="spinner spinner-sm"></span> Zenginlestiriliyor...
+              } @else {
+                &#10024; AI ile Zenginlestir
+              }
+            </button>
+            <button class="btn btn-primary btn-sm" (click)="editWord()">Duzenle</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteWord()">Sil</button>
           </div>
+        }
+      </div>
+
+      <!-- Metadata -->
+      <div class="hero-meta">
+        <span>Olusturulma: {{ w.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+        @if (w.updatedAt) {
+          <span class="divider">|</span>
+          <span>Guncellenme: {{ w.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
         }
       </div>
     </div>
 
     <!-- Pronunciations -->
     @if (w.pronunciations.length > 0) {
-      <div class="card section">
-        <h3>Telaffuz</h3>
-        @for (pron of w.pronunciations; track pron.id) {
-          <div class="pronunciation-item">
-            <span class="ipa">/{{ pron.ipaTranscription }}/</span>
-            @if (pron.variant) {
-              <span class="variant">({{ pron.variant }})</span>
-            }
-            @if (pron.isStandard) {
-              <span class="badge badge-success">Standart</span>
-            }
-          </div>
-        }
+      <div class="detail-section glass-card">
+        <h3 class="detail-section-title">&#128264; Telaffuz</h3>
+        <div class="pronunciation-list">
+          @for (pron of w.pronunciations; track pron.id) {
+            <div class="pronunciation-item">
+              <span class="ipa-text">/{{ pron.ipaTranscription }}/</span>
+              @if (pron.variant) {
+                <span class="pron-variant">({{ pron.variant }})</span>
+              }
+              @if (pron.isStandard) {
+                <span class="badge badge-success">Standart</span>
+              }
+            </div>
+          }
+        </div>
       </div>
     }
 
     <!-- Etymologies -->
     @if (w.etymologies.length > 0) {
-      <div class="card section">
-        <h3>Etimoloji</h3>
+      <div class="detail-section glass-card">
+        <h3 class="detail-section-title">&#128214; Etimoloji</h3>
         @for (etym of w.etymologies; track etym.id) {
           <div class="etymology-item">
             @if (etym.originLanguage) {
-              <span class="origin-lang">{{ etym.originLanguage.name }}:</span>
+              <span class="origin-lang-label">{{ etym.originLanguage.name }}:</span>
             }
-            <span>{{ etym.text }}</span>
+            <span class="etym-text">{{ etym.text }}</span>
           </div>
         }
       </div>
     }
 
     <!-- Senses -->
-    <div class="card section">
-      <div class="section-header">
-        <h3>Anlamlar</h3>
+    <div class="detail-section">
+      <div class="senses-header">
+        <h3 class="detail-section-title">&#128161; Anlamlar</h3>
         @if (isAuthenticated()) {
-          <button class="btn-secondary" (click)="toggleSenseForm()">Anlam Ekle</button>
+          <button class="btn btn-ghost btn-sm" (click)="toggleSenseForm()">+ Anlam Ekle</button>
         }
       </div>
 
       @if (showSenseForm()) {
-        <dict-sense-form
-          [wordId]="w.id"
-          (saved)="onSenseAdded()"
-          (cancelled)="toggleSenseForm()"
-        />
+        <div class="glass-card form-card">
+          <dict-sense-form
+            [wordId]="w.id"
+            (saved)="onSenseAdded()"
+            (cancelled)="toggleSenseForm()"
+          />
+        </div>
       }
 
       @for (sense of w.senses; track sense.id; let i = $index) {
-        <div class="sense-item">
-          <div class="sense-header">
-            <span class="sense-number">{{ sense.senseNumber }}.</span>
-            <span class="definition">{{ sense.definition }}</span>
+        <div class="sense-card glass-card">
+          <div class="sense-card-header">
+            <span class="sense-number-badge">{{ sense.senseNumber }}</span>
+            <p class="sense-definition">{{ sense.definition }}</p>
           </div>
 
           @if (sense.definitionShort) {
-            <div class="definition-short">{{ sense.definitionShort }}</div>
+            <p class="sense-definition-short">{{ sense.definitionShort }}</p>
           }
 
-          <div class="sense-badges">
+          <div class="sense-meta-badges">
             @if (sense.registerName) {
-              <span class="badge badge-register">{{ sense.registerName }}</span>
+              <span class="badge badge-warning">{{ sense.registerName }}</span>
             }
             @if (sense.domainName) {
-              <span class="badge badge-domain">{{ sense.domainName }}</span>
+              <span class="badge badge-accent">{{ sense.domainName }}</span>
             }
             @if (sense.difficultyLevel != null) {
-              <span class="badge badge-difficulty">{{ getDifficultyLabel(sense.difficultyLevel) }}</span>
+              <span class="badge badge-neutral">{{ getDifficultyLabel(sense.difficultyLevel) }}</span>
             }
           </div>
 
           <!-- Translations -->
           @if (sense.translations.length > 0) {
-            <div class="subsection">
-              <h4>Çeviriler</h4>
+            <div class="sense-subsection">
+              <h4 class="subsection-title">Ceviriler</h4>
               @for (trans of sense.translations; track trans.id) {
                 <div class="translation-item">
-                  <span class="translation-text">{{ trans.translationText }}</span>
-                  <span class="translation-meta">
-                    <span class="badge badge-lang">{{ trans.targetLanguage.code }}</span>
-                    <span class="badge badge-equiv">{{ getEquivalenceLabel(trans.equivalenceType) }}</span>
-                    <span class="confidence">%{{ (trans.confidenceScore * 100).toFixed(0) }}</span>
-                  </span>
+                  <div class="translation-main">
+                    <span class="translation-text">{{ trans.translationText }}</span>
+                    <div class="translation-badges">
+                      <span class="badge badge-primary">{{ trans.targetLanguage.code | uppercase }}</span>
+                      <span class="badge badge-neutral">{{ getEquivalenceLabel(trans.equivalenceType) }}</span>
+                    </div>
+                  </div>
+                  <div class="confidence-bar-wrapper">
+                    <div class="confidence-bar">
+                      <div class="confidence-fill" [style.width.%]="trans.confidenceScore * 100"></div>
+                    </div>
+                    <span class="confidence-label">%{{ (trans.confidenceScore * 100).toFixed(0) }}</span>
+                  </div>
                 </div>
               }
             </div>
           }
 
           @if (isAuthenticated()) {
-            <button class="btn-small" (click)="toggleTranslationForm(sense.id)">Çeviri Ekle</button>
+            <button class="btn btn-ghost btn-sm" (click)="toggleTranslationForm(sense.id)">+ Ceviri Ekle</button>
           }
 
           @if (showTranslationForm() === sense.id) {
-            <dict-translation-form
-              [wordId]="w.id"
-              [senseId]="sense.id"
-              (saved)="onTranslationAdded()"
-              (cancelled)="toggleTranslationForm(sense.id)"
-            />
+            <div class="form-card">
+              <dict-translation-form
+                [wordId]="w.id"
+                [senseId]="sense.id"
+                (saved)="onTranslationAdded()"
+                (cancelled)="toggleTranslationForm(sense.id)"
+              />
+            </div>
           }
 
           <!-- Examples -->
           @if (sense.examples.length > 0) {
-            <div class="subsection">
-              <h4>Örnekler</h4>
+            <div class="sense-subsection">
+              <h4 class="subsection-title">Ornekler</h4>
               @for (ex of sense.examples; track ex.id) {
                 <div class="example-item">
-                  <div class="example-source">{{ ex.sourceText }}</div>
+                  <div class="example-source-text">{{ ex.sourceText }}</div>
                   @if (ex.targetText) {
-                    <div class="example-target">{{ ex.targetText }}</div>
+                    <div class="example-target-text">&#8594; {{ ex.targetText }}</div>
                   }
-                  <span class="badge badge-secondary">{{ getExampleSourceLabel(ex.source) }}</span>
+                  <span class="badge badge-neutral">{{ getExampleSourceLabel(ex.source) }}</span>
                 </div>
               }
             </div>
           }
 
           @if (isAuthenticated()) {
-            <button class="btn-small" (click)="toggleExampleForm(sense.id)">Örnek Ekle</button>
+            <button class="btn btn-ghost btn-sm" (click)="toggleExampleForm(sense.id)">+ Ornek Ekle</button>
           }
 
           @if (showExampleForm() === sense.id) {
-            <dict-example-form
-              [wordId]="w.id"
-              [senseId]="sense.id"
-              (saved)="onExampleAdded()"
-              (cancelled)="toggleExampleForm(sense.id)"
-            />
+            <div class="form-card">
+              <dict-example-form
+                [wordId]="w.id"
+                [senseId]="sense.id"
+                (saved)="onExampleAdded()"
+                (cancelled)="toggleExampleForm(sense.id)"
+              />
+            </div>
           }
         </div>
       } @empty {
-        <p class="empty-text">Henüz anlam eklenmemiş.</p>
-      }
-    </div>
-
-    <!-- Metadata -->
-    <div class="card section metadata">
-      <p>Oluşturulma: {{ w.createdAt | date:'dd.MM.yyyy HH:mm' }}</p>
-      @if (w.updatedAt) {
-        <p>Güncellenme: {{ w.updatedAt | date:'dd.MM.yyyy HH:mm' }}</p>
+        <div class="empty-state glass-card-static">
+          <p>Henuz anlam eklenmemis.</p>
+        </div>
       }
     </div>
   </div>

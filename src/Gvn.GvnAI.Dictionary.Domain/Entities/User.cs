@@ -21,6 +21,11 @@ public class User : AggregateRoot
         };
     }
 
+    public void UpdateProfile(string fullName)
+    {
+        FullName = fullName;
+    }
+
     public void UpdatePassword(string passwordHash)
     {
         PasswordHash = passwordHash;

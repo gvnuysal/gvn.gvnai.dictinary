@@ -17,6 +17,12 @@ public class SenseRepository(DictionaryDbContext context)
         return max ?? 0;
     }
 
+    public async Task DeleteAllByWordIdAsync(Guid wordId, CancellationToken cancellationToken = default)
+    {
+        var senses = await DbSet.Where(s => s.WordId == wordId).ToListAsync(cancellationToken);
+        DbSet.RemoveRange(senses);
+    }
+
     public async Task<Sense?> GetByIdWithTranslationsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await DbSet

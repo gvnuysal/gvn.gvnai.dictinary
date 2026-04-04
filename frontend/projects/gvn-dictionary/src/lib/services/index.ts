@@ -5,3 +5,6 @@ export * from './word.service';
 export * from './sense.service';
 export * from './translation.service';
 export * from './example.service';
+export * from './quiz.service';
+export * from './favorite.service';
+export * from './profile.service';

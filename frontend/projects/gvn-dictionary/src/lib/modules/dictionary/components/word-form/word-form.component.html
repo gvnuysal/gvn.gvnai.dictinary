@@ -1,94 +1,98 @@
-<div class="form-container">
-  <div class="card">
-    <h2>@if (isEditMode()) { Kelime Düzenle } @else { Yeni Kelime Ekle }</h2>
-    <p class="subtitle">İngilizce kelime girin, Türkçe karşılığını ekleyin</p>
+<div class="page-container animate-in">
+  <div class="form-wrapper">
+    <div class="glass-card form-card">
+      <div class="form-title-section">
+        <h1>@if (isEditMode()) { Kelime Duzenle } @else { Yeni Kelime Ekle }</h1>
+        <p class="form-subtitle">Ingilizce kelime girin, Turkce karsiligini ekleyin</p>
+      </div>
 
-    @if (errorMessage()) {
-      <div class="error-message">{{ errorMessage() }}</div>
-    }
+      @if (errorMessage()) {
+        <div class="error-message">{{ errorMessage() }}</div>
+      }
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="form-row">
-        <div class="form-group flex-2">
-          <label for="lemma">İngilizce Kelime</label>
-          <input id="lemma" type="text" formControlName="lemma" placeholder="love, book, run..." autofocus />
-          @if (form.controls.lemma.touched && form.controls.lemma.invalid) {
-            <span class="field-error">Kelime gereklidir.</span>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="lemma">Ingilizce Kelime</label>
+            <input id="lemma" type="text" formControlName="lemma" placeholder="love, book, run..." autofocus />
+            @if (form.controls.lemma.touched && form.controls.lemma.invalid) {
+              <span class="field-error">Kelime gereklidir.</span>
+            }
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="partOfSpeechId">Sozcuk Turu</label>
+            <select id="partOfSpeechId" formControlName="partOfSpeechId">
+              <option value="" disabled>Tur secin</option>
+              @for (pos of partsOfSpeech(); track pos.id) {
+                <option [value]="pos.id">{{ pos.name }} ({{ pos.abbreviation }})</option>
+              }
+            </select>
+            @if (form.controls.partOfSpeechId.touched && form.controls.partOfSpeechId.invalid) {
+              <span class="field-error">Tur secimi gerekli.</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="definition">Ingilizce Tanim</label>
+          <textarea id="definition" formControlName="definition" rows="2"
+                    placeholder="A deep feeling of affection..."></textarea>
+          @if (form.controls.definition.touched && form.controls.definition.invalid) {
+            <span class="field-error">Tanim gereklidir.</span>
           }
         </div>
 
-        <div class="form-group flex-1">
-          <label for="partOfSpeechId">Sözcük Türü</label>
-          <select id="partOfSpeechId" formControlName="partOfSpeechId">
-            <option value="" disabled>Tür seçin</option>
-            @for (pos of partsOfSpeech(); track pos.id) {
-              <option [value]="pos.id">{{ pos.name }} ({{ pos.abbreviation }})</option>
-            }
-          </select>
-          @if (form.controls.partOfSpeechId.touched && form.controls.partOfSpeechId.invalid) {
-            <span class="field-error">Tür seçimi gerekli.</span>
+        <div class="form-group">
+          <label for="translationText">Turkce Karsiligi</label>
+          <input id="translationText" type="text" formControlName="translationText"
+                 placeholder="ask, sevgi..." />
+          @if (form.controls.translationText.touched && form.controls.translationText.invalid) {
+            <span class="field-error">Turkce karsilik gereklidir.</span>
           }
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="definition">İngilizce Tanım</label>
-        <textarea id="definition" formControlName="definition" rows="2"
-                  placeholder="A deep feeling of affection..."></textarea>
-        @if (form.controls.definition.touched && form.controls.definition.invalid) {
-          <span class="field-error">Tanım gereklidir.</span>
-        }
-      </div>
-
-      <div class="form-group">
-        <label for="translationText">Türkçe Karşılığı</label>
-        <input id="translationText" type="text" formControlName="translationText"
-               placeholder="aşk, sevgi..." />
-        @if (form.controls.translationText.touched && form.controls.translationText.invalid) {
-          <span class="field-error">Türkçe karşılık gereklidir.</span>
-        }
-      </div>
-
-      <div class="form-group">
-        <label for="definitionShort">Kısa Tanım (opsiyonel)</label>
-        <input id="definitionShort" type="text" formControlName="definitionShort"
-               placeholder="Deep affection" />
-      </div>
-
-      <div class="form-row">
-        <div class="form-group flex-1">
-          <label for="registerId">Kullanım (opsiyonel)</label>
-          <select id="registerId" formControlName="registerId">
-            <option value="">Seçiniz</option>
-            @for (reg of registers(); track reg.id) {
-              <option [value]="reg.id">{{ reg.name }}</option>
-            }
-          </select>
+        <div class="form-group">
+          <label for="definitionShort">Kisa Tanim (opsiyonel)</label>
+          <input id="definitionShort" type="text" formControlName="definitionShort"
+                 placeholder="Deep affection" />
         </div>
 
-        <div class="form-group flex-1">
-          <label for="domainId">Alan (opsiyonel)</label>
-          <select id="domainId" formControlName="domainId">
-            <option value="">Seçiniz</option>
-            @for (dom of domains(); track dom.id) {
-              <option [value]="dom.id">{{ dom.name }}</option>
-            }
-          </select>
-        </div>
-      </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="registerId">Kullanim (opsiyonel)</label>
+            <select id="registerId" formControlName="registerId">
+              <option value="">Seciniz</option>
+              @for (reg of registers(); track reg.id) {
+                <option [value]="reg.id">{{ reg.name }}</option>
+              }
+            </select>
+          </div>
 
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" (click)="router.navigate(['/words'])">İptal</button>
-        <button type="submit" class="btn btn-primary" [disabled]="loading()">
-          @if (loading()) {
-            Kaydediliyor...
-          } @else if (isEditMode()) {
-            Güncelle
-          } @else {
-            Kaydet
-          }
-        </button>
-      </div>
-    </form>
+          <div class="form-group flex-1">
+            <label for="domainId">Alan (opsiyonel)</label>
+            <select id="domainId" formControlName="domainId">
+              <option value="">Seciniz</option>
+              @for (dom of domains(); track dom.id) {
+                <option [value]="dom.id">{{ dom.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" (click)="router.navigate(['/words'])">Iptal</button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading()">
+            @if (loading()) {
+              <span class="spinner spinner-sm"></span> Kaydediliyor...
+            } @else if (isEditMode()) {
+              Guncelle
+            } @else {
+              Kaydet
+            }
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

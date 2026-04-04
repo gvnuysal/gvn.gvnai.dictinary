@@ -1,68 +1,55 @@
-<div class="word-list-container">
-  <div class="header">
-    <h2>Kelimeler</h2>
-    <div class="actions">
-      <select (change)="onLanguageChange($any($event.target).value)">
-        <option value="">Tüm Diller</option>
+<div class="page-container animate-in">
+  <div class="section-header">
+    <div>
+      <h1>Kelimeler</h1>
+      <p class="subtitle">{{ words().length > 0 ? totalCount() + ' kelime bulundu' : '' }}</p>
+    </div>
+    <div class="header-actions">
+      <select class="filter-select" (change)="onLanguageChange($any($event.target).value)">
+        <option value="">Tum Diller</option>
         @for (lang of languages(); track lang.id) {
           <option [value]="lang.id">{{ lang.name }}</option>
         }
       </select>
-
       @if (isAuthenticated()) {
-        <button class="btn-primary" (click)="navigateToCreate()">Yeni Kelime Ekle</button>
+        <button class="btn btn-primary" (click)="navigateToCreate()">+ Yeni Kelime</button>
       }
     </div>
   </div>
 
   @if (loading()) {
-    <div class="loading">Yükleniyor...</div>
-  } @else {
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Kelime</th>
-            <th>Dil</th>
-            <th>Tür</th>
-            <th>Durum</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (word of words(); track word.id) {
-            <tr (click)="navigateToDetail(word.id)" class="clickable">
-              <td class="lemma">{{ word.lemma }}</td>
-              <td>{{ word.language.code }}</td>
-              <td>{{ word.partOfSpeech.code }}</td>
-              <td>
-                <span class="badge" [class]="getStatusClass(word.status)">
-                  {{ getStatusLabel(word.status) }}
-                </span>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="4" class="empty">Kelime bulunamadı.</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+    <div class="loading-state"><span class="spinner"></span></div>
+  } @else if (words().length === 0) {
+    <div class="empty-state glass-card-static">
+      <div class="empty-icon">&#128218;</div>
+      <h3>Henuz kelime eklenmemis</h3>
+      <p>Ilk kelimeyi ekleyerek baslayabilirsiniz.</p>
     </div>
+  } @else {
+    <div class="word-grid">
+      @for (word of words(); track word.id) {
+        <div class="word-card glass-card" (click)="navigateToDetail(word.id)">
+          <div class="word-card-header">
+            <span class="lang-badge">{{ word.language.code | uppercase }}</span>
+            <span class="badge badge-primary">{{ word.partOfSpeech.code }}</span>
+          </div>
+          <h2 class="word-lemma">{{ word.lemma }}</h2>
+          <div class="word-card-footer">
+            <span class="status-dot" [class]="'status-' + getStatusDotClass(word.status)"></span>
+            <span class="status-text">{{ getStatusLabel(word.status) }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
 
-    @if (totalPages() > 1) {
-      <div class="pagination">
-        <button
-          [disabled]="!hasPreviousPage()"
-          (click)="goToPage(pageNumber() - 1)">
-          &laquo; Önceki
-        </button>
-        <span class="page-info">{{ pageNumber() }} / {{ totalPages() }} ({{ totalCount() }} kayıt)</span>
-        <button
-          [disabled]="!hasNextPage()"
-          (click)="goToPage(pageNumber() + 1)">
-          Sonraki &raquo;
-        </button>
-      </div>
-    }
+  @if (totalPages() > 1) {
+    <div class="pagination">
+      <button [disabled]="!hasPreviousPage()" (click)="goToPage(pageNumber() - 1)">&#8592;</button>
+      @for (p of pageNumbers(); track p) {
+        <button [class.active]="p === pageNumber()" (click)="goToPage(p)">{{ p }}</button>
+      }
+      <button [disabled]="!hasNextPage()" (click)="goToPage(pageNumber() + 1)">&#8594;</button>
+    </div>
   }
 </div>
