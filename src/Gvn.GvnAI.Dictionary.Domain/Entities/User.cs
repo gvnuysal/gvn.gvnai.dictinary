@@ -13,6 +13,7 @@ public class User : AggregateRoot
     public string TranslateProvider { get; private set; } = "claude"; // "claude" veya "google"
     public string? ClaudeApiKey { get; private set; }
     public string? GoogleTranslateApiKey { get; private set; }
+    public bool QuizAutoSpeak { get; private set; } = true; // Oyunda kelime gelince otomatik seslendir
 
     private User() { }
 
@@ -36,10 +37,11 @@ public class User : AggregateRoot
         PasswordHash = passwordHash;
     }
 
-    public void UpdateApiSettings(string translateProvider, string? claudeApiKey, string? googleTranslateApiKey)
+    public void UpdateApiSettings(string translateProvider, string? claudeApiKey, string? googleTranslateApiKey, bool quizAutoSpeak)
     {
         TranslateProvider = translateProvider;
         ClaudeApiKey = claudeApiKey;
         GoogleTranslateApiKey = googleTranslateApiKey;
+        QuizAutoSpeak = quizAutoSpeak;
     }
 }

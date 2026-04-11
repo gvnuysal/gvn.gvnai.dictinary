@@ -39,6 +39,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.GoogleTranslateApiKey)
             .HasMaxLength(500);
 
+        builder.Property(u => u.QuizAutoSpeak)
+            .HasDefaultValue(true);
+
         builder.HasIndex(u => u.Email).IsUnique();
     }
 }

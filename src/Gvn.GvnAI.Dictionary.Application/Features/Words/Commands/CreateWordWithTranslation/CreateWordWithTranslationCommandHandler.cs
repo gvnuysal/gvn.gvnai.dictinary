@@ -31,6 +31,8 @@ public sealed class CreateWordWithTranslationCommandHandler(
 
         // 1. Word oluştur (İngilizce)
         var word = Word.Create(request.Lemma, enLang.Id, request.PartOfSpeechId, request.UserId);
+        if (!string.IsNullOrWhiteSpace(request.Synonyms) || !string.IsNullOrWhiteSpace(request.Antonyms))
+            word.UpdateSynonyms(request.Synonyms, request.Antonyms);
         await wordRepository.AddAsync(word, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

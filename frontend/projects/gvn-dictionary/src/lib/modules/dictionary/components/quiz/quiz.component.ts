@@ -6,6 +6,7 @@ import { WordService } from '../../../../services/word.service';
 import { QuizQuestionDto, QuizAnswerResultDto, QuizResultDto } from '../../../../models/quiz.model';
 import { WordDto, SenseDto } from '../../../../models/word.model';
 import { TtsService } from '../../../../services/tts.service';
+import { ProfileService } from '../../../../services/profile.service';
 
 @Component({
   selector: 'dict-quiz',
@@ -18,7 +19,9 @@ import { TtsService } from '../../../../services/tts.service';
 export class QuizComponent implements OnDestroy {
   private readonly quizService = inject(QuizService);
   private readonly wordService = inject(WordService);
+  private readonly profileService = inject(ProfileService);
   readonly tts = inject(TtsService);
+  private quizAutoSpeak = true;
 
   readonly gameState = signal<'idle' | 'playing' | 'answered' | 'finished'>('idle');
   readonly sessionId = signal<string | null>(null);
@@ -53,6 +56,10 @@ export class QuizComponent implements OnDestroy {
 
   startGame(): void {
     this.loading.set(true);
+    // Profil ayarından auto-speak tercihini oku
+    this.profileService.getProfile().subscribe({
+      next: (p) => this.quizAutoSpeak = p.apiSettings.quizAutoSpeak,
+    });
     this.quizService.startQuiz().subscribe({
       next: (sessionId) => {
         this.sessionId.set(sessionId);
@@ -87,6 +94,10 @@ export class QuizComponent implements OnDestroy {
         this.gameState.set('playing');
         this.loading.set(false);
         this.startTimer();
+        // Otomatik seslendir
+        if (this.quizAutoSpeak && this.tts.isSupported) {
+          this.tts.speak(q.lemma, 'en-US');
+        }
       },
       error: () => {
         this.loading.set(false);

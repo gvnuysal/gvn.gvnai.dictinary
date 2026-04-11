@@ -25,6 +25,7 @@ export interface ApiSettingsDto {
   hasGoogleKey: boolean;
   claudeApiKey: string | null;
   googleTranslateApiKey: string | null;
+  quizAutoSpeak: boolean;
 }
 
 export interface UpdateProfileRequest {
@@ -35,4 +36,5 @@ export interface UpdateApiSettingsRequest {
   translateProvider: string;
   claudeApiKey: string | null;
   googleTranslateApiKey: string | null;
+  quizAutoSpeak: boolean;
 }

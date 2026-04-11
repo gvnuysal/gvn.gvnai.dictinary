@@ -126,7 +126,7 @@ public class QuizService(DictionaryDbContext dbContext) : IQuizService
     public async Task<List<LeaderboardEntryDto>> GetLeaderboardAsync(int top, CancellationToken ct = default)
     {
         var leaderboard = await dbContext.QuizSessions
-            .Where(q => q.IsCompleted)
+            .Where(q => q.TotalQuestions > 0)
             .GroupBy(q => q.UserId)
             .Select(g => new
             {

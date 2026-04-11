@@ -75,6 +75,12 @@
                 <span class="badge badge-primary">{{ word.partOfSpeech.code }}</span>
               </div>
               <h2 class="word-lemma">{{ word.lemma }}</h2>
+              @if (word.firstDefinition) {
+                <p class="word-definition">{{ word.firstDefinition }}</p>
+              }
+              @if (word.firstTranslation) {
+                <p class="word-translation">&#127481;&#127479; {{ word.firstTranslation }}</p>
+              }
               <div class="word-card-footer">
                 <span class="status-dot" [class]="'status-' + getStatusDotClass(word.status)"></span>
                 <span class="status-text">{{ getStatusLabel(word.status) }}</span>

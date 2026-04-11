@@ -44,6 +44,7 @@
                 &#10024; AI ile Zenginlestir
               }
             </button>
+            <a routerLink="/words/new" class="btn btn-accent btn-sm">+ Yeni Kelime</a>
             <button class="btn btn-primary btn-sm" (click)="editWord()">Duzenle</button>
             <button class="btn btn-danger btn-sm" (click)="deleteWord()">Sil</button>
           </div>
@@ -59,6 +60,32 @@
         }
       </div>
     </div>
+
+    <!-- Synonyms & Antonyms -->
+    @if (w.synonyms || w.antonyms) {
+      <div class="detail-section glass-card">
+        @if (w.synonyms) {
+          <div class="syn-ant-row">
+            <span class="syn-ant-label">&#128279; Es Anlamlilar</span>
+            <div class="syn-ant-tags">
+              @for (s of w.synonyms.split(','); track $index) {
+                <span class="tag tag-synonym">{{ s.trim() }}</span>
+              }
+            </div>
+          </div>
+        }
+        @if (w.antonyms) {
+          <div class="syn-ant-row">
+            <span class="syn-ant-label">&#8596; Zit Anlamlilar</span>
+            <div class="syn-ant-tags">
+              @for (a of w.antonyms.split(','); track $index) {
+                <span class="tag tag-antonym">{{ a.trim() }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
 
     <!-- Pronunciations -->
     @if (w.pronunciations.length > 0) {

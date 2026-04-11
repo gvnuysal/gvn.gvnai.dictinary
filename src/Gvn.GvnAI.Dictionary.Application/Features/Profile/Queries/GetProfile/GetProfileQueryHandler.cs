@@ -23,7 +23,8 @@ public sealed class GetProfileQueryHandler(
             !string.IsNullOrWhiteSpace(user.ClaudeApiKey),
             !string.IsNullOrWhiteSpace(user.GoogleTranslateApiKey),
             user.ClaudeApiKey,
-            user.GoogleTranslateApiKey);
+            user.GoogleTranslateApiKey,
+            user.QuizAutoSpeak);
 
         return Result<ProfileDto>.Ok(new ProfileDto(
             user.Id, user.Email, user.FullName, user.Role,

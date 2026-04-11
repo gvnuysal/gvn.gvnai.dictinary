@@ -82,6 +82,18 @@ public class TranslateController(
         return result is null ? StatusCode(503, new { message = "Translation unavailable." }) : Ok(new { translatedText = result, provider });
     }
 
+    [HttpGet("synonyms")]
+    public async Task<IActionResult> GetSynonyms([FromQuery] string word)
+    {
+        if (string.IsNullOrWhiteSpace(word)) return BadRequest("Word is required.");
+        var user = await userRepository.GetByIdAsync(GetUserId());
+        var key = user?.ClaudeApiKey;
+        if (string.IsNullOrWhiteSpace(key)) return BadRequest(new { message = "Claude API key ayarlanmamis." });
+
+        var (synonyms, antonyms) = await aiService.GetSynonymsAsync(key, word);
+        return Ok(new { synonyms, antonyms });
+    }
+
     private Guid GetUserId()
     {
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);

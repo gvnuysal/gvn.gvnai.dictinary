@@ -112,6 +112,14 @@
                    placeholder="{{ p.apiSettings.hasGoogleKey ? '••••••••  (mevcut, degistirmek icin yeni girin)' : 'AIza...' }}" />
           </div>
 
+          <div class="form-group toggle-group">
+            <label class="toggle-label">
+              <input type="checkbox" formControlName="quizAutoSpeak" />
+              <span class="toggle-switch"></span>
+              <span>Oyunda kelime gelince otomatik seslendir</span>
+            </label>
+          </div>
+
           <div class="api-actions">
             <button type="button" class="btn btn-ghost btn-sm" (click)="cancelEditApi()">Iptal</button>
             <button type="submit" class="btn btn-primary btn-sm" [disabled]="savingApi()">
@@ -142,6 +150,12 @@
             } @else {
               <span class="api-status">&#10060; Ayarlanmamis</span>
             }
+          </div>
+          <div class="api-row">
+            <span class="api-label">Oyunda Otomatik Seslendir</span>
+            <span class="api-status" [class.configured]="p.apiSettings.quizAutoSpeak">
+              {{ p.apiSettings.quizAutoSpeak ? '&#9989; Acik' : '&#10060; Kapali' }}
+            </span>
           </div>
           <button class="btn btn-ghost btn-sm" (click)="startEditApi()">&#9881; Duzenle</button>
         </div>

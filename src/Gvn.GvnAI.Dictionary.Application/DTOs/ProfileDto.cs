@@ -24,4 +24,5 @@ public sealed record ApiSettingsDto(
     bool HasClaudeKey,
     bool HasGoogleKey,
     string? ClaudeApiKey,
-    string? GoogleTranslateApiKey);
+    string? GoogleTranslateApiKey,
+    bool QuizAutoSpeak);

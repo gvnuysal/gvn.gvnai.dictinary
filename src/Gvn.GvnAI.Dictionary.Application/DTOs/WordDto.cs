@@ -7,6 +7,7 @@ public sealed record WordDto(
     LanguageSummaryDto Language, PartOfSpeechSummaryDto PartOfSpeech,
     WordStatus Status, int? FrequencyRank, DifficultyLevel? DifficultyLevel,
     bool IsCompound, bool IsIdiom, bool IsProperNoun,
+    string? Synonyms, string? Antonyms,
     List<SenseDto> Senses,
     List<PronunciationDto> Pronunciations,
     List<EtymologyDto> Etymologies,
@@ -15,4 +16,5 @@ public sealed record WordDto(
 public sealed record WordSummaryDto(
     Guid Id, string Lemma,
     LanguageSummaryDto Language, PartOfSpeechSummaryDto PartOfSpeech,
-    WordStatus Status, DateTime CreatedAt);
+    WordStatus Status, DateTime CreatedAt,
+    string? FirstDefinition, string? FirstTranslation);

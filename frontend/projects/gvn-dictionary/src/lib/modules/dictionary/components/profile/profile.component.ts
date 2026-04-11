@@ -38,6 +38,7 @@ export class ProfileComponent implements OnInit {
     translateProvider: ['claude'],
     claudeApiKey: [''],
     googleTranslateApiKey: [''],
+    quizAutoSpeak: [true],
   });
 
   ngOnInit(): void {
@@ -50,7 +51,7 @@ export class ProfileComponent implements OnInit {
       next: (p) => {
         this.profile.set(p);
         this.form.patchValue({ fullName: p.fullName });
-        this.apiForm.patchValue({ translateProvider: p.apiSettings.translateProvider });
+        this.apiForm.patchValue({ translateProvider: p.apiSettings.translateProvider, quizAutoSpeak: p.apiSettings.quizAutoSpeak });
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -107,6 +108,7 @@ export class ProfileComponent implements OnInit {
       translateProvider: v.translateProvider,
       claudeApiKey: v.claudeApiKey || null,
       googleTranslateApiKey: v.googleTranslateApiKey || null,
+      quizAutoSpeak: v.quizAutoSpeak,
     }).subscribe({
       next: () => {
         this.savingApi.set(false);

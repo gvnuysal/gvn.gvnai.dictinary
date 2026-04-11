@@ -10,4 +10,6 @@ public sealed record CreateWordWithTranslationCommand(
     string TranslationText,
     string? DefinitionShort = null,
     Guid? RegisterId = null,
-    Guid? DomainId = null) : ICommand<Guid>;
+    Guid? DomainId = null,
+    string? Synonyms = null,
+    string? Antonyms = null) : ICommand<Guid>;

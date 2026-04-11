@@ -48,6 +48,7 @@ public class WordRepository(DictionaryDbContext context)
     {
         var queryable = DbSet
             .Include(w => w.Senses)
+                .ThenInclude(s => s.Translations)
             .AsQueryable();
 
         if (userId.HasValue)

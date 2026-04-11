@@ -6,4 +6,5 @@ public sealed record UpdateApiSettingsCommand(
     Guid UserId,
     string TranslateProvider,
     string? ClaudeApiKey,
-    string? GoogleTranslateApiKey) : ICommand;
+    string? GoogleTranslateApiKey,
+    bool QuizAutoSpeak = true) : ICommand;

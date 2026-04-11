@@ -14,6 +14,8 @@ public class Word : AggregateRoot, ISoftDeletable
     public string Lemma { get; private set; } = null!;
     public Guid UserId { get; private set; }
     public Guid LanguageId { get; private set; }
+    public string? Synonyms { get; private set; }
+    public string? Antonyms { get; private set; }
     public Guid PartOfSpeechId { get; private set; }
     public int? FrequencyRank { get; private set; }
     public DifficultyLevel? DifficultyLevel { get; private set; }
@@ -61,6 +63,12 @@ public class Word : AggregateRoot, ISoftDeletable
         IsCompound = isCompound;
         IsIdiom = isIdiom;
         IsProperNoun = isProperNoun;
+    }
+
+    public void UpdateSynonyms(string? synonyms, string? antonyms)
+    {
+        Synonyms = synonyms;
+        Antonyms = antonyms;
     }
 
     public Sense AddSense(

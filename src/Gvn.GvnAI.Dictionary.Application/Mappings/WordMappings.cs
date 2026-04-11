@@ -22,6 +22,7 @@ public static class WordMappings
             language, pos,
             word.Status, word.FrequencyRank, word.DifficultyLevel,
             word.IsCompound, word.IsIdiom, word.IsProperNoun,
+            word.Synonyms, word.Antonyms,
             word.Senses.Select(s => s.ToDto(registers, domains, languages, partsOfSpeech)).ToList(),
             word.Pronunciations.Select(p => p.ToDto()).ToList(),
             word.Etymologies.Select(e => e.ToDto(etymologyLanguages)).ToList(),
@@ -33,7 +34,12 @@ public static class WordMappings
         LanguageSummaryDto language,
         PartOfSpeechSummaryDto pos)
     {
-        return new WordSummaryDto(word.Id, word.Lemma, language, pos, word.Status, word.CreatedAt);
+        var firstSense = word.Senses.OrderBy(s => s.SenseNumber).FirstOrDefault();
+        var firstDef = firstSense?.Definition;
+        var firstTrans = firstSense?.Translations.FirstOrDefault()?.TranslationText;
+
+        return new WordSummaryDto(word.Id, word.Lemma, language, pos, word.Status, word.CreatedAt,
+            firstDef, firstTrans);
     }
 
     // --- Sense ---

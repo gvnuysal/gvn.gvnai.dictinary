@@ -13,4 +13,6 @@ public interface IAiDictionaryService
     Task<string?> TranslateWordAsync(string apiKey, string word, string targetLang, CancellationToken cancellationToken = default);
 
     Task<string?> DetectPartOfSpeechAsync(string apiKey, string word, CancellationToken cancellationToken = default);
+
+    Task<(string? Synonyms, string? Antonyms)> GetSynonymsAsync(string apiKey, string word, CancellationToken cancellationToken = default);
 }

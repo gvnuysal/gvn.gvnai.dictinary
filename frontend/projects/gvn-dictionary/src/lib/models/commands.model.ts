@@ -12,6 +12,8 @@ export interface CreateWordWithTranslationRequest {
   definitionShort?: string | null;
   registerId?: string | null;
   domainId?: string | null;
+  synonyms?: string | null;
+  antonyms?: string | null;
 }
 
 export interface UpdateWordRequest {

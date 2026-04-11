@@ -15,7 +15,7 @@ public sealed class UpdateApiSettingsCommandHandler(
         if (user is null)
             return Result.Fail(Error.NotFound("USER_NOT_FOUND", "User not found."));
 
-        user.UpdateApiSettings(request.TranslateProvider, request.ClaudeApiKey, request.GoogleTranslateApiKey);
+        user.UpdateApiSettings(request.TranslateProvider, request.ClaudeApiKey, request.GoogleTranslateApiKey, request.QuizAutoSpeak);
         await userRepository.UpdateAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

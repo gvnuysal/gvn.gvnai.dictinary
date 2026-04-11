@@ -11,6 +11,8 @@ export interface WordDto {
   isCompound: boolean;
   isIdiom: boolean;
   isProperNoun: boolean;
+  synonyms: string | null;
+  antonyms: string | null;
   senses: SenseDto[];
   pronunciations: PronunciationDto[];
   etymologies: EtymologyDto[];
@@ -25,6 +27,8 @@ export interface WordSummaryDto {
   partOfSpeech: PartOfSpeechSummaryDto;
   status: WordStatus;
   createdAt: string;
+  firstDefinition: string | null;
+  firstTranslation: string | null;
 }
 
 export interface SenseDto {

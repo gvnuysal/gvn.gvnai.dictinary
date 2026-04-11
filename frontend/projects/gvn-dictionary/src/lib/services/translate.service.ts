@@ -39,4 +39,10 @@ export class TranslateService {
       .get<{ posCode: string }>(`${this.config.baseUrl}/api/translate/detect-pos`, { params })
       .pipe(map(r => r.posCode));
   }
+
+  getSynonyms(word: string): Observable<{ synonyms: string | null; antonyms: string | null }> {
+    const params = new HttpParams().set('word', word);
+    return this.http.get<{ synonyms: string | null; antonyms: string | null }>(
+      `${this.config.baseUrl}/api/translate/synonyms`, { params });
+  }
 }

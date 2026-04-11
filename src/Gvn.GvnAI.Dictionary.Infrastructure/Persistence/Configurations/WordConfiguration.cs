@@ -21,6 +21,8 @@ public class WordConfiguration : IEntityTypeConfiguration<Word>
         builder.Property(w => w.IsCompound).HasDefaultValue(false);
         builder.Property(w => w.IsIdiom).HasDefaultValue(false);
         builder.Property(w => w.IsProperNoun).HasDefaultValue(false);
+        builder.Property(w => w.Synonyms).HasMaxLength(1000);
+        builder.Property(w => w.Antonyms).HasMaxLength(1000);
         builder.Property(w => w.Status).IsRequired().HasConversion<string>().HasMaxLength(20);
 
         // ISoftDeletable

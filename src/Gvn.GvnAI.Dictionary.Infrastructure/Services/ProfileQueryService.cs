@@ -10,7 +10,7 @@ public class ProfileQueryService(DictionaryDbContext dbContext) : IProfileQueryS
     public async Task<ProfileStatsDto> GetUserStatsAsync(Guid userId, CancellationToken ct = default)
     {
         var quizStats = await dbContext.QuizSessions
-            .Where(q => q.UserId == userId && q.IsCompleted)
+            .Where(q => q.UserId == userId && q.TotalQuestions > 0)
             .GroupBy(_ => 1)
             .Select(g => new
             {

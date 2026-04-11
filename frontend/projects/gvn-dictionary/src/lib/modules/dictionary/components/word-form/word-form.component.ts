@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, debounceTime, distinctUntilChanged, filter, switchMap, takeUntil } from 'rxjs';
+import { Subject, EMPTY, debounceTime, distinctUntilChanged, filter, switchMap, takeUntil, catchError } from 'rxjs';
 import { WordService } from '../../../../services/word.service';
 import { LookupService } from '../../../../services/lookup.service';
 import { SpeechService } from '../../../../services/speech.service';
@@ -44,6 +44,8 @@ export class WordFormComponent implements OnInit, OnDestroy {
     definition: ['', [Validators.required, Validators.maxLength(2000)]],
     translationText: ['', [Validators.required, Validators.maxLength(500)]],
     definitionShort: [''],
+    synonyms: [''],
+    antonyms: [''],
     registerId: [''],
     domainId: [''],
   });
@@ -97,7 +99,9 @@ export class WordFormComponent implements OnInit, OnDestroy {
       filter(v => v.trim().length >= 2),
       switchMap(text => {
         this.translating.set(true);
-        return this.translateService.aiTranslate(text, 'tr');
+        return this.translateService.aiTranslate(text, 'tr').pipe(
+          catchError(() => { this.translating.set(false); return EMPTY; })
+        );
       })
     ).subscribe({
       next: (translated) => {
@@ -106,7 +110,6 @@ export class WordFormComponent implements OnInit, OnDestroy {
           this.form.controls.translationText.setValue(translated);
         }
       },
-      error: () => this.translating.set(false),
     });
 
     // Lemma değişince → Claude AI ile İngilizce tanım getir
@@ -115,7 +118,7 @@ export class WordFormComponent implements OnInit, OnDestroy {
       debounceTime(800),
       distinctUntilChanged(),
       filter(v => v.trim().length >= 2),
-      switchMap(text => this.translateService.define(text))
+      switchMap(text => this.translateService.define(text).pipe(catchError(() => EMPTY)))
     ).subscribe({
       next: (definition) => {
         if (!this.form.controls.definition.dirty || !this.form.controls.definition.value) {
@@ -130,7 +133,7 @@ export class WordFormComponent implements OnInit, OnDestroy {
       debounceTime(700),
       distinctUntilChanged(),
       filter(v => v.trim().length >= 2),
-      switchMap(text => this.translateService.detectPos(text))
+      switchMap(text => this.translateService.detectPos(text).pipe(catchError(() => EMPTY)))
     ).subscribe({
       next: (posCode) => {
         if (!this.form.controls.partOfSpeechId.dirty || !this.form.controls.partOfSpeechId.value) {
@@ -138,6 +141,24 @@ export class WordFormComponent implements OnInit, OnDestroy {
           if (match) {
             this.form.controls.partOfSpeechId.setValue(match.id);
           }
+        }
+      },
+    });
+
+    // Lemma değişince → Claude AI ile eş/zıt anlamlılar getir
+    this.form.controls.lemma.valueChanges.pipe(
+      takeUntil(this.destroy$),
+      debounceTime(900),
+      distinctUntilChanged(),
+      filter(v => v.trim().length >= 2),
+      switchMap(text => this.translateService.getSynonyms(text).pipe(catchError(() => EMPTY)))
+    ).subscribe({
+      next: (result) => {
+        if (result.synonyms && (!this.form.controls.synonyms.dirty || !this.form.controls.synonyms.value)) {
+          this.form.controls.synonyms.setValue(result.synonyms);
+        }
+        if (result.antonyms && (!this.form.controls.antonyms.dirty || !this.form.controls.antonyms.value)) {
+          this.form.controls.antonyms.setValue(result.antonyms);
         }
       },
     });
@@ -185,6 +206,7 @@ export class WordFormComponent implements OnInit, OnDestroy {
         lemma: v.lemma, partOfSpeechId: v.partOfSpeechId, definition: v.definition,
         translationText: v.translationText, definitionShort: v.definitionShort || null,
         registerId: v.registerId || null, domainId: v.domainId || null,
+        synonyms: v.synonyms || null, antonyms: v.antonyms || null,
       }).subscribe({
         next: (id) => { this.loading.set(false); this.router.navigate(['/words', id]); },
         error: (err) => { this.loading.set(false); this.errorMessage.set(this.extractError(err)); },

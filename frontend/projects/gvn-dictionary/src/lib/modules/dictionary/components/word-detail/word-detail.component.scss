@@ -38,6 +38,47 @@
   50% { box-shadow: 0 0 12px 4px rgba(0, 206, 201, 0.25); }
 }
 
+/* Synonyms & Antonyms */
+.syn-ant-row {
+  margin-bottom: 0.8rem;
+  &:last-child { margin-bottom: 0; }
+}
+
+.syn-ant-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.syn-ant-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tag {
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.tag-synonym {
+  background: rgba(0, 184, 148, 0.1);
+  color: var(--color-success);
+  border: 1px solid rgba(0, 184, 148, 0.2);
+}
+
+.tag-antonym {
+  background: rgba(255, 107, 107, 0.1);
+  color: var(--color-danger);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
 /* Favorite button */
 .btn-favorite {
   font-size: 1.4rem;

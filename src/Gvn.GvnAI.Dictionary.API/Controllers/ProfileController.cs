@@ -31,7 +31,7 @@ public class ProfileController(IMediator mediator) : ApiControllerBase
     public async Task<IActionResult> UpdateApiSettings([FromBody] UpdateApiSettingsRequest request)
     {
         var result = await mediator.Send(new UpdateApiSettingsCommand(
-            GetUserId(), request.TranslateProvider, request.ClaudeApiKey, request.GoogleTranslateApiKey));
+            GetUserId(), request.TranslateProvider, request.ClaudeApiKey, request.GoogleTranslateApiKey, request.QuizAutoSpeak));
         return HandleResult(result);
     }
 
@@ -43,4 +43,4 @@ public class ProfileController(IMediator mediator) : ApiControllerBase
 }
 
 public record UpdateProfileRequest(string FullName);
-public record UpdateApiSettingsRequest(string TranslateProvider, string? ClaudeApiKey, string? GoogleTranslateApiKey);
+public record UpdateApiSettingsRequest(string TranslateProvider, string? ClaudeApiKey, string? GoogleTranslateApiKey, bool QuizAutoSpeak = true);

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
 import { DatePipe, UpperCasePipe } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { WordService } from '../../../../services/word.service';
 import { AuthService } from '../../../../services/auth.service';
 import { FavoriteService } from '../../../../services/favorite.service';
@@ -13,7 +13,7 @@ import { ExampleFormComponent } from '../example-form/example-form.component';
 @Component({
   selector: 'dict-word-detail',
   standalone: true,
-  imports: [DatePipe, UpperCasePipe, SenseFormComponent, TranslationFormComponent, ExampleFormComponent],
+  imports: [DatePipe, UpperCasePipe, RouterLink, SenseFormComponent, TranslationFormComponent, ExampleFormComponent],
   templateUrl: './word-detail.component.html',
   styleUrl: './word-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
