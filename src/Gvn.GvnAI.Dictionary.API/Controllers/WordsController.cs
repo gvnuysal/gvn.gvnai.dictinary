@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Gvn.GvnAI.Dictionary.Application.Features.Words.Commands.CreateWord;
 using Gvn.GvnAI.Dictionary.Application.Features.Words.Commands.CreateWordWithTranslation;
 using Gvn.GvnAI.Dictionary.Application.Features.Words.Commands.DeleteWord;
@@ -7,8 +6,6 @@ using Gvn.GvnAI.Dictionary.Application.Features.Words.Commands.UpdateWord;
 using Gvn.GvnAI.Dictionary.Application.Features.Words.Queries.GetWordById;
 using Gvn.GvnAI.Dictionary.Application.Features.Words.Queries.GetWords;
 using Gvn.GvnAI.Dictionary.Application.Features.Words.Queries.SearchWords;
-using Gvn.GvnAI.Dictionary.Domain.Shared.Enums;
-using Gvn.GvnFramework.AspNetCore.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gvn.GvnAI.Dictionary.API.Controllers;
 
 [Route("api/[controller]")]
-public class WordsController(IMediator mediator) : ApiControllerBase
+public class WordsController(IMediator mediator) : DictionaryControllerBase
 {
     [Authorize]
     [HttpGet]
@@ -97,9 +94,4 @@ public class WordsController(IMediator mediator) : ApiControllerBase
         return HandleResult(result);
     }
 
-    private Guid GetUserId()
-    {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        return Guid.Parse(claim!.Value);
-    }
 }

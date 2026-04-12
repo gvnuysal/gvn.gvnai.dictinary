@@ -12,4 +12,6 @@ public sealed record UpdateWordCommand(
     DifficultyLevel? DifficultyLevel,
     bool IsCompound,
     bool IsIdiom,
-    bool IsProperNoun) : ICommand;
+    bool IsProperNoun,
+    string? Synonyms = null,
+    string? Antonyms = null) : ICommand;

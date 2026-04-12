@@ -10,6 +10,7 @@ public class ProfileQueryService(DictionaryDbContext dbContext) : IProfileQueryS
     public async Task<ProfileStatsDto> GetUserStatsAsync(Guid userId, CancellationToken ct = default)
     {
         var quizStats = await dbContext.QuizSessions
+            .AsNoTracking()
             .Where(q => q.UserId == userId && q.TotalQuestions > 0)
             .GroupBy(_ => 1)
             .Select(g => new
@@ -24,6 +25,7 @@ public class ProfileQueryService(DictionaryDbContext dbContext) : IProfileQueryS
             .FirstOrDefaultAsync(ct);
 
         var favoriteCount = await dbContext.Favorites
+            .AsNoTracking()
             .CountAsync(f => f.UserId == userId, ct);
 
         var gamesPlayed = quizStats?.GamesPlayed ?? 0;

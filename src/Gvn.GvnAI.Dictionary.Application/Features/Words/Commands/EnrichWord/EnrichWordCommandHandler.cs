@@ -122,6 +122,18 @@ public sealed class EnrichWordCommandHandler(
             await etymologyRepository.AddAsync(etym, cancellationToken);
         }
 
+        // Synonyms / antonyms (best effort — başarısız olursa zenginleştirmeyi blocklamayalım)
+        try
+        {
+            var (synonyms, antonyms) = await aiService.GetSynonymsAsync(claudeKey, word.Lemma, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(synonyms) || !string.IsNullOrWhiteSpace(antonyms))
+                word.UpdateSynonyms(synonyms, antonyms);
+        }
+        catch
+        {
+            // ignore — synonyms zenginleştirme akışını bozmamalı
+        }
+
         // Status güncelle
         word.Approve();
         await wordRepository.UpdateAsync(word, cancellationToken);

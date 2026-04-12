@@ -19,7 +19,8 @@ public sealed class UpdateWordCommandHandler(
         word.Update(
             request.Lemma, request.LanguageId, request.PartOfSpeechId,
             request.FrequencyRank, request.DifficultyLevel,
-            request.IsCompound, request.IsIdiom, request.IsProperNoun);
+            request.IsCompound, request.IsIdiom, request.IsProperNoun,
+            request.Synonyms, request.Antonyms);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -4,7 +4,6 @@ using Gvn.GvnAI.Dictionary.Application.Features.Quiz.Commands.SubmitAnswer;
 using Gvn.GvnAI.Dictionary.Application.Features.Quiz.Queries.GetLeaderboard;
 using Gvn.GvnAI.Dictionary.Application.Features.Quiz.Queries.GetNextQuestion;
 using Gvn.GvnAI.Dictionary.Application.Features.Quiz.Queries.GetQuizResult;
-using Gvn.GvnFramework.AspNetCore.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gvn.GvnAI.Dictionary.API.Controllers;
 
 [Route("api/[controller]")]
-public class QuizController(IMediator mediator) : ApiControllerBase
+public class QuizController(IMediator mediator) : DictionaryControllerBase
 {
     [Authorize]
     [HttpPost("start")]
@@ -63,11 +62,6 @@ public class QuizController(IMediator mediator) : ApiControllerBase
         return HandleResult(result);
     }
 
-    private Guid GetUserId()
-    {
-        var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-        return Guid.Parse(claim!.Value);
-    }
 }
 
 public record SubmitAnswerRequest(Guid WordId, Guid? SelectedOptionId, Guid CorrectOptionId, int ResponseTimeMs);

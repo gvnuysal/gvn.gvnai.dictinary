@@ -1,8 +1,6 @@
-using System.Security.Claims;
 using Gvn.GvnAI.Dictionary.Application.Features.Favorites.Commands.AddFavorite;
 using Gvn.GvnAI.Dictionary.Application.Features.Favorites.Commands.RemoveFavorite;
 using Gvn.GvnAI.Dictionary.Application.Features.Favorites.Queries.GetFavorites;
-using Gvn.GvnFramework.AspNetCore.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +9,7 @@ namespace Gvn.GvnAI.Dictionary.API.Controllers;
 
 [Authorize]
 [Route("api/[controller]")]
-public class FavoritesController(IMediator mediator) : ApiControllerBase
+public class FavoritesController(IMediator mediator) : DictionaryControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetFavorites()
@@ -43,9 +41,4 @@ public class FavoritesController(IMediator mediator) : ApiControllerBase
             errors => HandleResult(result));
     }
 
-    private Guid GetUserId()
-    {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        return Guid.Parse(claim!.Value);
-    }
 }

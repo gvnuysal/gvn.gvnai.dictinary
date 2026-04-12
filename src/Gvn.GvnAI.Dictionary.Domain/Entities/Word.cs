@@ -53,7 +53,8 @@ public class Word : AggregateRoot, ISoftDeletable
     public void Update(
         string lemma, Guid languageId, Guid partOfSpeechId,
         int? frequencyRank, DifficultyLevel? difficultyLevel,
-        bool isCompound, bool isIdiom, bool isProperNoun)
+        bool isCompound, bool isIdiom, bool isProperNoun,
+        string? synonyms = null, string? antonyms = null)
     {
         Lemma = lemma.Trim();
         LanguageId = languageId;
@@ -63,12 +64,23 @@ public class Word : AggregateRoot, ISoftDeletable
         IsCompound = isCompound;
         IsIdiom = isIdiom;
         IsProperNoun = isProperNoun;
+        Synonyms = NormalizeSynonymList(synonyms);
+        Antonyms = NormalizeSynonymList(antonyms);
     }
 
     public void UpdateSynonyms(string? synonyms, string? antonyms)
     {
-        Synonyms = synonyms;
-        Antonyms = antonyms;
+        Synonyms = NormalizeSynonymList(synonyms);
+        Antonyms = NormalizeSynonymList(antonyms);
+    }
+
+    private static string? NormalizeSynonymList(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return null;
+        var trimmed = value.Trim();
+        if (trimmed.Length > 1000)
+            throw new ArgumentException("Synonym/antonym list cannot exceed 1000 characters.", nameof(value));
+        return trimmed;
     }
 
     public Sense AddSense(

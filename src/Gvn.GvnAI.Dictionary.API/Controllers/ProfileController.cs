@@ -1,8 +1,6 @@
-using System.Security.Claims;
 using Gvn.GvnAI.Dictionary.Application.Features.Profile.Commands.UpdateApiSettings;
 using Gvn.GvnAI.Dictionary.Application.Features.Profile.Commands.UpdateProfile;
 using Gvn.GvnAI.Dictionary.Application.Features.Profile.Queries.GetProfile;
-using Gvn.GvnFramework.AspNetCore.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +9,7 @@ namespace Gvn.GvnAI.Dictionary.API.Controllers;
 
 [Authorize]
 [Route("api/[controller]")]
-public class ProfileController(IMediator mediator) : ApiControllerBase
+public class ProfileController(IMediator mediator) : DictionaryControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetProfile()
@@ -35,11 +33,6 @@ public class ProfileController(IMediator mediator) : ApiControllerBase
         return HandleResult(result);
     }
 
-    private Guid GetUserId()
-    {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        return Guid.Parse(claim!.Value);
-    }
 }
 
 public record UpdateProfileRequest(string FullName);

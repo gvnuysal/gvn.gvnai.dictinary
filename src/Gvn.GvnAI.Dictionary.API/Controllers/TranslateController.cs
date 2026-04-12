@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Gvn.GvnAI.Dictionary.Application.Abstractions;
 using Gvn.GvnAI.Dictionary.Domain.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +11,7 @@ namespace Gvn.GvnAI.Dictionary.API.Controllers;
 public class TranslateController(
     ITranslateService googleTranslateService,
     IAiDictionaryService aiService,
-    IUserRepository userRepository) : ControllerBase
+    IUserRepository userRepository) : DictionaryControllerBase
 {
     [HttpGet("define")]
     public async Task<IActionResult> Define([FromQuery] string word)
@@ -94,9 +93,4 @@ public class TranslateController(
         return Ok(new { synonyms, antonyms });
     }
 
-    private Guid GetUserId()
-    {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        return Guid.Parse(claim!.Value);
-    }
 }
