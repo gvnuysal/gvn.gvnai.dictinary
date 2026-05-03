@@ -3,6 +3,7 @@ using System;
 using Gvn.GvnAI.Dictionary.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Gvn.GvnAI.Dictionary.Infrastructure.Migrations
 {
     [DbContext(typeof(DictionaryDbContext))]
-    partial class DictionaryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260503123845_SeedPartsOfSpeech")]
+    partial class SeedPartsOfSpeech
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,88 +145,6 @@ namespace Gvn.GvnAI.Dictionary.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("languages", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-000000000001"),
-                            Code = "en",
-                            Direction = "LTR",
-                            Name = "English",
-                            NativeName = "English"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-000000000002"),
-                            Code = "tr",
-                            Direction = "LTR",
-                            Name = "Turkish",
-                            NativeName = "Türkçe"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-000000000003"),
-                            Code = "de",
-                            Direction = "LTR",
-                            Name = "German",
-                            NativeName = "Deutsch"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-000000000004"),
-                            Code = "fr",
-                            Direction = "LTR",
-                            Name = "French",
-                            NativeName = "Français"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-000000000005"),
-                            Code = "es",
-                            Direction = "LTR",
-                            Name = "Spanish",
-                            NativeName = "Español"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-000000000006"),
-                            Code = "it",
-                            Direction = "LTR",
-                            Name = "Italian",
-                            NativeName = "Italiano"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-000000000007"),
-                            Code = "ru",
-                            Direction = "LTR",
-                            Name = "Russian",
-                            NativeName = "Русский"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-000000000008"),
-                            Code = "ar",
-                            Direction = "RTL",
-                            Name = "Arabic",
-                            NativeName = "العربية"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-000000000009"),
-                            Code = "ja",
-                            Direction = "LTR",
-                            Name = "Japanese",
-                            NativeName = "日本語"
-                        },
-                        new
-                        {
-                            Id = new Guid("22222222-0000-0000-0000-00000000000a"),
-                            Code = "zh",
-                            Direction = "LTR",
-                            Name = "Chinese",
-                            NativeName = "中文"
-                        });
                 });
 
             modelBuilder.Entity("Gvn.GvnAI.Dictionary.Domain.Entities.PartOfSpeech", b =>
