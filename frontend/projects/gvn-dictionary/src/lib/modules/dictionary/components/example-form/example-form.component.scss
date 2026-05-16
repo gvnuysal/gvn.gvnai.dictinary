@@ -62,6 +62,14 @@
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    .btn-primary, .btn-cancel { flex: 1 1 auto; }
+  }
+}
+
+.inline-form {
+  @media (max-width: 640px) { padding: 0.8rem 0.9rem; }
 }
 
 .btn-primary {

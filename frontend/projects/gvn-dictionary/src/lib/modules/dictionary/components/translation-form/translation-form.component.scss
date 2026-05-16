@@ -42,6 +42,23 @@
 .form-row {
   display: flex;
   gap: 0.75rem;
+  flex-wrap: wrap;
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 0.5rem;
+    .form-group { width: 100%; }
+  }
+}
+
+.form-actions {
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    .btn-primary, .btn-cancel { flex: 1 1 auto; }
+  }
+}
+
+.inline-form {
+  @media (max-width: 640px) { padding: 0.8rem 0.9rem; }
 }
 
 .field-error {

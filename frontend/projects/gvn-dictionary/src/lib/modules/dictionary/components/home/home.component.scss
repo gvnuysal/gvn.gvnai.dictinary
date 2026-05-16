@@ -6,6 +6,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  @media (max-width: 640px) { padding: 0 0.9rem; }
 }
 
 .section-title {
@@ -15,6 +16,7 @@
   color: var(--text-heading);
   margin-bottom: 2.5rem;
   letter-spacing: -0.5px;
+  @media (max-width: 640px) { font-size: 1.35rem; margin-bottom: 1.6rem; }
 }
 
 // ─── Hero ───
@@ -211,50 +213,60 @@
 }
 
 // ─── Responsive ───
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
+  .hero {
+    padding: 4.5rem 1.2rem 3rem;
+    .hero-title { font-size: 2.6rem; }
+    .hero-tagline { font-size: 1.05rem; }
+  }
+  .features { padding: 3rem 0; }
   .features .features-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .how-it-works { padding: 3rem 0; }
+  .stats { padding: 2rem 0 3.5rem; }
+  .stats .stats-row { padding: 1.6rem 2rem; gap: 1.8rem; }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .hero {
-    padding: 4rem 1rem 3rem;
-
-    .hero-title {
-      font-size: 2.2rem;
-    }
-
-    .hero-tagline {
-      font-size: 1rem;
-    }
+    padding: 2.5rem 0.9rem 2rem;
+    .hero-badge { font-size: 0.7rem; padding: 0.25rem 0.8rem; margin-bottom: 1rem; }
+    .hero-title { font-size: 1.9rem; }
+    .hero-tagline { font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .hero-actions { gap: 0.6rem; }
+    .hero-actions .btn { flex: 1 1 100%; min-width: 0; }
   }
 
+  .features { padding: 2rem 0; }
   .features .features-grid {
     grid-template-columns: 1fr;
+    gap: 0.8rem;
   }
+  .features .feature-card { padding: 1.2rem 1rem; }
 
   .how-it-works {
-    .steps {
-      flex-direction: column;
-    }
-
+    padding: 2rem 0;
+    .steps { flex-direction: column; gap: 0.5rem; }
+    .step { flex: 0 1 auto; }
     .step-connector {
       width: 2px;
-      height: 30px;
+      height: 24px;
       margin-bottom: 0;
     }
   }
 
-  .stats .stats-row {
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1.5rem;
-  }
-
-  .stats .stat-divider {
-    width: 40px;
-    height: 1px;
+  .stats {
+    padding: 1.5rem 0 2.5rem;
+    .stats-row {
+      flex-direction: column;
+      gap: 1.2rem;
+      padding: 1.2rem;
+    }
+    .stat-divider {
+      width: 40px;
+      height: 1px;
+    }
   }
 }
 
