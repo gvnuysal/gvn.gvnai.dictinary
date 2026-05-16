@@ -473,43 +473,129 @@
 // =============================================
 // RESPONSIVE
 // =============================================
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
+  .options-grid { gap: 0.6rem; }
+}
+
+@media (max-width: 640px) {
+  .quiz-start { margin: 1rem auto; }
+  .quiz-icon { font-size: 3rem; }
+  .quiz-hero h1 { font-size: 1.6rem; }
+  .quiz-subtitle { font-size: 0.9rem; }
+
+  .quiz-header {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
   .quiz-stats {
-    gap: 0.5rem;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    order: 2;
   }
 
   .stat {
     padding: 0.3rem 0.5rem;
-    min-width: 48px;
+    min-width: 44px;
   }
 
   .stat-value {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
   }
 
   .timer-ring {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
+    order: 1;
   }
 
   .timer-text {
-    font-size: 1.1rem;
+    font-size: 1rem;
+  }
+
+  .word-question {
+    padding: 1.2rem 0.8rem;
+    margin-bottom: 1rem;
   }
 
   .question-word {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    word-break: break-word;
+  }
+
+  .question-definition {
+    font-size: 0.82rem;
   }
 
   .options-grid {
     grid-template-columns: 1fr;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .option-card {
+    padding: 0.9rem 0.8rem;
+    min-height: 56px;
+    font-size: 0.9rem;
   }
 
   .result-stats {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-stat {
+    padding: 0.7rem 0.4rem;
+    .value { font-size: 1.2rem; }
   }
 
   .final-score {
-    font-size: 2.2rem;
+    font-size: 2rem;
+  }
+
+  .result-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .result-icon {
+    font-size: 3rem;
+  }
+
+  .history-item {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.8rem;
+    gap: 0.4rem;
+  }
+
+  .history-word { min-width: 0; max-width: 100%; }
+  .history-points { margin-left: 0; }
+
+  .result-actions {
+    flex-direction: column;
+    gap: 0.6rem;
+    .btn { width: 100%; }
+  }
+
+  // Modal
+  .modal-overlay { padding: 1rem; }
+  .modal-content {
+    padding: 1.2rem;
+    max-height: calc(85vh - 70px);
+  }
+  .modal-header .modal-word {
+    font-size: 1.6rem;
+  }
+  .modal-translation,
+  .modal-example { margin-left: 0; }
+  .modal-sense {
+    padding: 0.8rem;
+    .modal-sense-header { gap: 0.4rem; }
   }
 }
 
