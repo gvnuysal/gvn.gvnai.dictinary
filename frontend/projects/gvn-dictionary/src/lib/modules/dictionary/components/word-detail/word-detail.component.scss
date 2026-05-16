@@ -120,6 +120,7 @@
   align-items: flex-start;
   gap: 1.5rem;
   flex-wrap: wrap;
+  @media (max-width: 640px) { gap: 0.8rem; }
 }
 
 .hero-info {
@@ -132,6 +133,9 @@
   font-weight: 800;
   margin-bottom: 0.6rem;
   line-height: 1.2;
+  word-break: break-word;
+  @media (max-width: 1024px) { font-size: 2rem; }
+  @media (max-width: 640px)  { font-size: 1.6rem; }
 }
 
 .hero-badges {
@@ -172,6 +176,12 @@
   gap: 0.5rem;
   flex-wrap: wrap;
   align-items: flex-start;
+  @media (max-width: 640px) {
+    width: 100%;
+    gap: 0.4rem;
+    .btn { flex: 1 1 auto; min-width: 0; }
+    .btn-favorite, .btn-icon { flex: 0 0 auto; }
+  }
 }
 
 .btn-ai-enrich {
@@ -321,6 +331,7 @@
   font-style: italic;
   margin: 0 0 0.5rem;
   padding-left: 2.8rem;
+  @media (max-width: 640px) { padding-left: 0; }
 }
 
 .sense-meta-badges {
@@ -329,12 +340,14 @@
   flex-wrap: wrap;
   margin-bottom: 0.6rem;
   padding-left: 2.8rem;
+  @media (max-width: 640px) { padding-left: 0; }
 }
 
 /* Translations */
 .sense-subsection {
   margin-top: 0.8rem;
   padding-left: 2.8rem;
+  @media (max-width: 640px) { padding-left: 0; }
 }
 
 .subsection-title {
@@ -360,7 +373,10 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 0.4rem;
+  @media (max-width: 640px) { align-items: flex-start; }
 }
+
+.translation-text { word-break: break-word; }
 
 .translation-text {
   font-weight: 600;

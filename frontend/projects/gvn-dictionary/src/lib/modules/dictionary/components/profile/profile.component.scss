@@ -3,6 +3,12 @@
   align-items: center;
   gap: 1.5rem;
   margin-bottom: 2rem;
+  @media (max-width: 640px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
 }
 
 .avatar {
@@ -17,6 +23,7 @@
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
+  @media (max-width: 640px) { width: 64px; height: 64px; font-size: 1.6rem; }
 }
 
 .profile-info {
@@ -59,6 +66,7 @@
   align-items: center;
   gap: 0.8rem;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 
   .name-input {
     padding: 0.5rem 0.8rem;
@@ -71,11 +79,19 @@
     font-family: 'Inter', sans-serif;
     outline: none;
     width: 250px;
+    max-width: 100%;
   }
 
   .edit-actions {
     display: flex;
     gap: 0.4rem;
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: stretch;
+    .name-input { width: 100%; font-size: 1.05rem; }
+    .edit-actions { justify-content: center; }
   }
 }
 
@@ -91,6 +107,11 @@
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 0.8rem;
   margin-bottom: 2.5rem;
+  @media (max-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.8rem;
+  }
 }
 
 .stat-card {
@@ -125,6 +146,10 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 0.8rem;
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
 }
 
 .fav-card {
@@ -133,6 +158,7 @@
   gap: 0.5rem;
   padding: 0.8rem 1rem;
   position: relative;
+  @media (max-width: 640px) { padding: 0.6rem 0.8rem; }
 
   .fav-link {
     display: flex;
@@ -174,6 +200,9 @@
   }
 
   &:hover .btn-remove { opacity: 1; }
+  @media (hover: none) {
+    .btn-remove { opacity: 1; }
+  }
 }
 
 .empty-state {
@@ -202,6 +231,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.8rem;
   margin-top: 0.3rem;
+  @media (max-width: 480px) { gap: 0.5rem; }
 }
 
 .radio-card {
@@ -257,6 +287,8 @@
     justify-content: space-between;
     padding: 0.6rem 0;
     border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 0.5rem;
 
     &:last-of-type { border-bottom: none; }
   }
@@ -293,6 +325,11 @@
   gap: 0.6rem;
   justify-content: flex-end;
   margin-top: 1rem;
+  flex-wrap: wrap;
+  @media (max-width: 640px) {
+    flex-direction: column-reverse;
+    .btn { width: 100%; }
+  }
 }
 
 .spinner-xs {

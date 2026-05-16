@@ -4,6 +4,12 @@
 
   h1 { font-size: 2rem; margin-bottom: 0.3rem; }
   .search-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+  @media (max-width: 640px) {
+    margin-bottom: 1.2rem;
+    h1 { font-size: 1.4rem; }
+    .search-subtitle { font-size: 0.85rem; margin-bottom: 1rem; }
+  }
 }
 
 .search-bar {
@@ -43,6 +49,11 @@
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), 0 4px 20px rgba(0, 0, 0, 0.15);
   }
+
+  @media (max-width: 640px) {
+    padding: 0.75rem 1rem 0.75rem 2.6rem;
+    font-size: 1rem;
+  }
 }
 
 .filter-row {
@@ -51,6 +62,11 @@
   flex-wrap: wrap;
   justify-content: center;
   margin-bottom: 2rem;
+  @media (max-width: 640px) {
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+    .filter-select { flex: 1 1 calc(50% - 0.25rem); min-width: 0; }
+  }
 }
 
 .filter-select {
@@ -82,6 +98,15 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+}
+
+.word-lemma { word-break: break-word; }
+@media (max-width: 640px) {
+  .word-lemma { font-size: 1.2rem; }
 }
 
 .word-card {
